@@ -7,7 +7,7 @@ channels:
   # - torchvision=0.15
 dependencies:
   - _libgcc_mutex=0.1=main
-  - gym-mujoco
+  - gym-mujoco=0.21.0
   - blas=1.0=mkl
   - ca-certificates=2020.12.8=h06a4308_0
   - certifi=2020.12.5=py37h06a4308_0

@@ -1,13 +1,16 @@
 name: transformer-metarl
 channels:
+  - nvidia
   - pytorch
-  - defaults
+  # - defaults
   - conda-forge
   # - pytorch=2.0
   # - torchvision=0.15
 dependencies:
+  - pytorch=2.0
+  - pytorch-cuda=11.8
+  - gym-mujoco
   # - _libgcc_mutex=0.1=main
-  # - gym-mujoco=0.24.0
   # - blas=1.0=mkl
   # - ca-certificates=2020.12.8=h06a4308_0
   # - certifi=2020.12.5=py37h06a4308_0
@@ -39,7 +42,6 @@ dependencies:
   # - pip=20.2.4=py37h06a4308_0
   # - python=3.7.9=h7579374_0
   # # - pytorch=1.7.1=py3.7_cuda10.1.243_cudnn7.6.3_0
-  - pytorch=1.7.1
   # - readline=8.0=h7b6447c_0
   # - setuptools=50.3.1=py37h06a4308_1
   # - six=1.15.0=py37h06a4308_0

@@ -2,6 +2,8 @@ name: transformer-metarl
 channels:
   - pytorch
   - defaults
+  # - pytorch=2.0
+  # - torchvision=0.15
 dependencies:
   - _libgcc_mutex=0.1=main
   - blas=1.0=mkl
@@ -34,7 +36,8 @@ dependencies:
   - pillow=8.0.1=py37he98fc37_0
   - pip=20.2.4=py37h06a4308_0
   - python=3.7.9=h7579374_0
-  - pytorch=1.7.1=py3.7_cuda10.1.243_cudnn7.6.3_0
+  # - pytorch=1.7.1=py3.7_cuda10.1.243_cudnn7.6.3_0
+  - pytorch=1.7.1
   - readline=8.0=h7b6447c_0
   - setuptools=50.3.1=py37h06a4308_1
   - six=1.15.0=py37h06a4308_0

@@ -2,6 +2,7 @@
 """PEARL HalfCheetahVel example."""
 import click
 import gym
+import d4rl
 
 from garage.envs import GymEnv, normalize
 from garage.envs.mujoco import HalfCheetahVelEnv

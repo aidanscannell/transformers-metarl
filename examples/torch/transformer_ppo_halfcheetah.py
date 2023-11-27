@@ -8,7 +8,7 @@ from garage.torch import set_gpu_mode
 from garage import wrap_experiment
 from garage.envs import GymEnv
 
-# from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
+from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
 
 # from garage.envs.metaworld import ML1Env
 from garage.experiment import (
@@ -195,7 +195,8 @@ def transformer_ppo_halfcheetah(
         value_function = data["algo"].value_function
 
     trainer = Trainer(ctxt)
-    env_class = get_env(env_name)
+    env_class = HalfCheetahVelEnv
+    # env_class = get_env(env_name)
     tasks = task_sampler.SetTaskSampler(
         env_class,
         wrapper=lambda env, _: RL2Env(

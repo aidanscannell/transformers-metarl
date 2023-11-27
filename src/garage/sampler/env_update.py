@@ -109,10 +109,11 @@ class SetTaskUpdate(EnvUpdate):
         """
         if old_env is None:
             return self._make_env()
-        elif not isinstance(getattr(old_env, 'unwrapped', old_env),
-                            self._env_type):
-            warnings.warn('SetTaskEnvUpdate is closing an environment. This '
-                          'may indicate a very slow TaskSampler setup.')
+        elif not isinstance(getattr(old_env, "unwrapped", old_env), self._env_type):
+            warnings.warn(
+                "SetTaskEnvUpdate is closing an environment. This "
+                "may indicate a very slow TaskSampler setup."
+            )
             old_env.close()
             return self._make_env()
         else:
@@ -153,7 +154,9 @@ class ExistingEnvUpdate(EnvUpdate):
             dict: The pickled state.
 
         """
-        warnings.warn('ExistingEnvUpdate is generally not the most efficient '
-                      'method of transmitting environments to other '
-                      'processes.')
+        warnings.warn(
+            "ExistingEnvUpdate is generally not the most efficient "
+            "method of transmitting environments to other "
+            "processes."
+        )
         return self.__dict__

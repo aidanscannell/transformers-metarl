@@ -8,7 +8,7 @@ channels:
 dependencies:
   - pytorch=2.0
   - pytorch-cuda=11.8
-  - tensorflow-gpu==1.4.0
+  - tensorflow-gpu==1.4.1
   # - gym-mujoco
   # - _libgcc_mutex=0.1=main
   # - blas=1.0=mkl

@@ -33,10 +33,9 @@ class LocalSampler(Sampler):
         self._factory = worker_factory
         self._agents = worker_factory.prepare_worker_messages(agents)
         self._envs = worker_factory.prepare_worker_messages(
-            envs, preprocess=copy.deepcopy)
-        self._workers = [
-            worker_factory(i) for i in range(worker_factory.n_workers)
-        ]
+            envs, preprocess=copy.deepcopy
+        )
+        self._workers = [worker_factory(i) for i in range(worker_factory.n_workers)]
         for worker, agent, env in zip(self._workers, self._agents, self._envs):
             worker.update_agent(agent)
             worker.update_env(env)
@@ -82,13 +81,15 @@ class LocalSampler(Sampler):
         """
         agent_updates = self._factory.prepare_worker_messages(agent_update)
         env_updates = self._factory.prepare_worker_messages(
-            env_update, preprocess=copy.deepcopy)
-        for worker, agent_up, env_up in zip(self._workers, agent_updates,
-                                            env_updates):
+            env_update, preprocess=copy.deepcopy
+        )
+        for worker, agent_up, env_up in zip(self._workers, agent_updates, env_updates):
             worker.update_agent(agent_up)
             worker.update_env(env_up)
 
-    def obtain_samples(self, itr, num_samples, agent_update, env_update=None, deterministic=False):
+    def obtain_samples(
+        self, itr, num_samples, agent_update, env_update=None, deterministic=False
+    ):
         """Collect at least a given number transitions (timesteps).
 
         Args:
@@ -115,7 +116,8 @@ class LocalSampler(Sampler):
         idx_offset = 0
         while True:
             for worker in self._workers:
-                batch = worker.rollout(deterministic, idx_offset=idx_offset)
+                batch = worker.rollout(deterministic)
+                # batch = worker.rollout(deterministic, idx_offset=idx_offset)
                 completed_samples += len(batch.actions)
                 batches.append(batch)
                 if completed_samples >= num_samples:
@@ -124,10 +126,7 @@ class LocalSampler(Sampler):
                     return samples
             idx_offset += len(self._workers)
 
-    def obtain_exact_episodes(self,
-                              n_eps_per_worker,
-                              agent_update,
-                              env_update=None):
+    def obtain_exact_episodes(self, n_eps_per_worker, agent_update, env_update=None):
         """Sample an exact number of episodes per worker.
 
         Args:
@@ -172,7 +171,7 @@ class LocalSampler(Sampler):
         """
         state = self.__dict__.copy()
         # Workers aren't picklable (but WorkerFactory is).
-        state['_workers'] = None
+        state["_workers"] = None
         return state
 
     def __setstate__(self, state):
@@ -183,9 +182,7 @@ class LocalSampler(Sampler):
 
         """
         self.__dict__.update(state)
-        self._workers = [
-            self._factory(i) for i in range(self._factory.n_workers)
-        ]
+        self._workers = [self._factory(i) for i in range(self._factory.n_workers)]
         for worker, agent, env in zip(self._workers, self._agents, self._envs):
             worker.update_agent(agent)
             worker.update_env(env)

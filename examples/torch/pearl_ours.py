@@ -112,7 +112,8 @@ def pearl_half_cheetah_vel(
     embedding_mini_batch_size=100,
     max_episode_length=200,
     reward_scale=5.0,
-    use_gpu=False,
+    use_gpu=True,
+    # use_gpu=False,
 ):
     """Train PEARL with HalfCheetahVel environment.
 
@@ -159,23 +160,34 @@ def pearl_half_cheetah_vel(
 
     env_name = "hopper-medium-v2"
 
-    def make_env():
-        env = gym.make(env_name)
+    def env_wrapper(env, *args):
         env = MassDampingENV(env)
-        env.reset(0)  # between 0 and 24
+        # wrapper = lambda env, _: normalize(
+        #     GymEnv(env, max_episode_length=max_episode_length)
+        # )
+        task = 0
+        # env = wrapper(env, task)
+        env.reset(task)  # between 0 and 24
         return env
+
+    # def make_env():
+    #     env = gym.make(env_name)
+    #     env = MassDampingENV(env)
+    #     env.reset(0)  # between 0 and 24
+    #     return env
 
     # create multi-task environment and sample tasks
     env_sampler = SetTaskSampler(
-        make_env,
+        # make_env,
+        HalfCheetahVelEnv,
         wrapper=lambda env, _: normalize(
             GymEnv(env, max_episode_length=max_episode_length)
         ),
     )
     env = env_sampler.sample(num_train_tasks)
     test_env_sampler = SetTaskSampler(
-        # HalfCheetahVelEnv,
-        make_env,
+        HalfCheetahVelEnv,
+        # make_env,
         wrapper=lambda env, _: normalize(
             GymEnv(env, max_episode_length=max_episode_length)
         ),

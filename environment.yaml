@@ -4,6 +4,7 @@ channels:
   - pytorch
   # - defaults
   - conda-forge
+  - anaconda
 dependencies:
   - pytorch=2.0
   - pytorch-cuda=11.8

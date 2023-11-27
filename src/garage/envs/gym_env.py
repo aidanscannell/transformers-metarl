@@ -13,15 +13,15 @@ from garage import Environment, EnvSpec, EnvStep, StepType
 # entry points don't close their viewer windows.
 KNOWN_GYM_NOT_CLOSE_VIEWER = [
     # Please keep alphabetized
-    'gym.envs.atari',
-    'gym.envs.box2d',
-    'gym.envs.classic_control'
+    "gym.envs.atari",
+    "gym.envs.box2d",
+    "gym.envs.classic_control",
 ]
 
 KNOWN_GYM_NOT_CLOSE_MJ_VIEWER = [
     # Please keep alphabetized
-    'gym.envs.mujoco',
-    'gym.envs.robotics'
+    "gym.envs.mujoco",
+    "gym.envs.robotics",
 ]
 
 
@@ -43,17 +43,17 @@ def _get_time_limit(env, max_episode_length):
             match the environment time limit.
     """
     spec_steps = None
-    if hasattr(env, 'spec') and env.spec and hasattr(env.spec,
-                                                     'max_episode_steps'):
+    if hasattr(env, "spec") and env.spec and hasattr(env.spec, "max_episode_steps"):
         spec_steps = env.spec.max_episode_steps
-    elif hasattr(env, '_max_episode_steps'):
-        spec_steps = getattr(env, '_max_episode_steps')
+    elif hasattr(env, "_max_episode_steps"):
+        spec_steps = getattr(env, "_max_episode_steps")
 
     if spec_steps:
         if max_episode_length is not None and max_episode_length != spec_steps:
-            warnings.warn('Overriding max_episode_length. Replacing gym time'
-                          'limit ({}), with {}'.format(spec_steps,
-                                                       max_episode_length))
+            warnings.warn(
+                "Overriding max_episode_length. Replacing gym time"
+                "limit ({}), with {}".format(spec_steps, max_episode_length)
+            )
             return max_episode_length
         return spec_steps
     return max_episode_length
@@ -94,20 +94,21 @@ class GymEnv(Environment):
         # pylint: disable=import-outside-toplevel
         # Determine if the input env is a bullet-based gym environment
         env = None
-        if 'env' in kwargs:  # env passed as a keyword arg
-            env = kwargs['env']
+        if "env" in kwargs:  # env passed as a keyword arg
+            env = kwargs["env"]
         elif len(args) >= 1:
             # env passed as a positional arg
             env = args[0]
 
         if isinstance(env, gym.Env):
-            if env.spec and hasattr(env.spec,
-                                    'id') and env.spec.id.find('Bullet') >= 0:
+            if env.spec and hasattr(env.spec, "id") and env.spec.id.find("Bullet") >= 0:
                 from garage.envs.bullet import BulletEnv
+
                 return BulletEnv(*args, **kwargs)
         elif isinstance(env, str):
-            if 'Bullet' in env:
+            if "Bullet" in env:
                 from garage.envs.bullet import BulletEnv
+
                 return BulletEnv(*args, **kwargs)
 
         return super(GymEnv, cls).__new__(cls)
@@ -137,24 +138,29 @@ class GymEnv(Environment):
         elif isinstance(env, gym.Env):
             self._env = env
         else:
-            raise ValueError('GymEnv can take env as either a string, '
-                             'or an Gym environment, but got type {} '
-                             'instead.'.format(type(env)))
+            raise ValueError(
+                "GymEnv can take env as either a string, "
+                "or an Gym environment, but got type {} "
+                "instead.".format(type(env))
+            )
 
-        self._max_episode_length = _get_time_limit(self._env,
-                                                   max_episode_length)
+        self._max_episode_length = _get_time_limit(self._env, max_episode_length)
 
-        self._render_modes = self._env.metadata['render.modes']
+        # self._render_modes = self._env.metadata['render.modes']
+        self._render_modes = self._env.metadata["render_modes"]
 
         self._step_cnt = None
         self._visualize = False
 
         self._action_space = akro.from_gym(self._env.action_space)
-        self._observation_space = akro.from_gym(self._env.observation_space,
-                                                is_image=is_image)
-        self._spec = EnvSpec(action_space=self.action_space,
-                             observation_space=self.observation_space,
-                             max_episode_length=self._max_episode_length)
+        self._observation_space = akro.from_gym(
+            self._env.observation_space, is_image=is_image
+        )
+        self._spec = EnvSpec(
+            action_space=self.action_space,
+            observation_space=self.observation_space,
+            max_episode_length=self._max_episode_length,
+        )
         # stores env_info keys & value types to ensure subsequent env_infos
         # are consistent
         self._env_info = None
@@ -215,7 +221,7 @@ class GymEnv(Environment):
 
         """
         if self._step_cnt is None:
-            raise RuntimeError('reset() must be called before step()!')
+            raise RuntimeError("reset() must be called before step()!")
 
         observation, reward, done, info = self._env.step(action)
 
@@ -224,7 +230,7 @@ class GymEnv(Environment):
                 img = self._env.viewer._read_pixels_as_in_window()
                 imageio.imwrite(self._filepath + str(self._ss_counter) + ".jpg", img)
                 self._ss_counter += 1
-            self._env.render(mode='human') 
+            self._env.render(mode="human")
 
         reward = float(reward) if not isinstance(reward, float) else reward
         self._step_cnt += 1
@@ -232,7 +238,8 @@ class GymEnv(Environment):
         step_type = StepType.get_step_type(
             step_cnt=self._step_cnt,
             max_episode_length=self._max_episode_length,
-            done=done)
+            done=done,
+        )
 
         # gym envs that are wrapped in TimeLimit wrapper modify
         # the done/termination signal to be true whenever a time
@@ -242,13 +249,13 @@ class GymEnv(Environment):
         # termination. The time limit termination signal
         # will be saved inside env_infos as
         # 'GymEnv.TimeLimitTerminated'
-        if 'TimeLimit.truncated' in info or step_type == StepType.TIMEOUT:
-            info['GymEnv.TimeLimitTerminated'] = True
-            info['TimeLimit.truncated'] = info.get('TimeLimit.truncated', True)
+        if "TimeLimit.truncated" in info or step_type == StepType.TIMEOUT:
+            info["GymEnv.TimeLimitTerminated"] = True
+            info["TimeLimit.truncated"] = info.get("TimeLimit.truncated", True)
             step_type = StepType.TIMEOUT
         else:
-            info['TimeLimit.truncated'] = False
-            info['GymEnv.TimeLimitTerminated'] = False
+            info["TimeLimit.truncated"] = False
+            info["GymEnv.TimeLimitTerminated"] = False
 
         if step_type in (StepType.TERMINAL, StepType.TIMEOUT):
             self._step_cnt = None
@@ -257,21 +264,24 @@ class GymEnv(Environment):
         if not self._env_info:
             self._env_info = {k: type(info[k]) for k in info}
         elif self._env_info.keys() != info.keys():
-            raise RuntimeError('GymEnv outputs inconsistent env_info keys.')
+            raise RuntimeError("GymEnv outputs inconsistent env_info keys.")
         if not self.spec.observation_space.contains(observation):
             # Discrete actions can be either in the space normally, or one-hot
             # encoded.
-            if self.spec.observation_space.flat_dim != np.prod(
-                    observation.shape):
-                raise RuntimeError('GymEnv observation shape does not '
-                                   'conform to its observation_space')
+            if self.spec.observation_space.flat_dim != np.prod(observation.shape):
+                raise RuntimeError(
+                    "GymEnv observation shape does not "
+                    "conform to its observation_space"
+                )
 
-        return EnvStep(env_spec=self.spec,
-                       action=action,
-                       reward=reward,
-                       observation=observation,
-                       env_info=info,
-                       step_type=step_type)
+        return EnvStep(
+            env_spec=self.spec,
+            action=action,
+            reward=reward,
+            observation=observation,
+            env_info=info,
+            step_type=step_type,
+        )
 
     def render(self, mode):
         """Renders the environment.
@@ -287,9 +297,9 @@ class GymEnv(Environment):
         self._validate_render_mode(mode)
         return self._env.render(mode)
 
-    def visualize(self, screenshot=False, filepath='screenshot_mujoco'):
+    def visualize(self, screenshot=False, filepath="screenshot_mujoco"):
         """Creates a visualization of the environment."""
-        self._env.render(mode='human')
+        self._env.render(mode="human")
         self._screenshot = screenshot
         self._filepath = filepath
         self._ss_counter = 0
@@ -314,9 +324,11 @@ class GymEnv(Environment):
         """
         # We need to do some strange things here to fix-up flaws in gym
         # pylint: disable=import-outside-toplevel
-        if hasattr(self._env, 'spec') and self._env.spec:
-            if any(package in getattr(self._env.spec, 'entry_point', '')
-                   for package in KNOWN_GYM_NOT_CLOSE_MJ_VIEWER):
+        if hasattr(self._env, "spec") and self._env.spec:
+            if any(
+                package in getattr(self._env.spec, "entry_point", "")
+                for package in KNOWN_GYM_NOT_CLOSE_MJ_VIEWER
+            ):
                 # This import is not in the header to avoid a MuJoCo dependency
                 # with non-MuJoCo environments that use this base class.
                 try:
@@ -326,16 +338,21 @@ class GymEnv(Environment):
                     # If we can't import mujoco_py, we must not have an
                     # instance of a class that we know how to close here.
                     return
-                if (hasattr(self._env, 'viewer')
-                        and isinstance(self._env.viewer, MjViewer)):
+                if hasattr(self._env, "viewer") and isinstance(
+                    self._env.viewer, MjViewer
+                ):
                     glfw.destroy_window(self._env.viewer.window)
-            elif any(package in getattr(self._env.spec, 'entry_point', '')
-                     for package in KNOWN_GYM_NOT_CLOSE_VIEWER):
-                if hasattr(self._env, 'viewer'):
+            elif any(
+                package in getattr(self._env.spec, "entry_point", "")
+                for package in KNOWN_GYM_NOT_CLOSE_VIEWER
+            ):
+                if hasattr(self._env, "viewer"):
                     from gym.envs.classic_control.rendering import (
-                        Viewer, SimpleImageViewer)
-                    if (isinstance(self._env.viewer,
-                                   (SimpleImageViewer, Viewer))):
+                        Viewer,
+                        SimpleImageViewer,
+                    )
+
+                    if isinstance(self._env.viewer, (SimpleImageViewer, Viewer)):
                         self._env.viewer.close()
 
     def __getstate__(self):
@@ -353,7 +370,7 @@ class GymEnv(Environment):
         if issubclass(env.__class__, gym.Wrapper):
             env = env.unwrapped
 
-        if 'viewer' in env.__dict__:
+        if "viewer" in env.__dict__:
             _viewer = env.viewer
             # remove the viewer and make a copy of the state
             env.viewer = None
@@ -371,8 +388,7 @@ class GymEnv(Environment):
             state (dict): Unpickled state of this object.
 
         """
-        self.__init__(state['_env'],
-                      max_episode_length=state['_max_episode_length'])
+        self.__init__(state["_env"], max_episode_length=state["_max_episode_length"])
 
     def __getattr__(self, name):
         """Handle function calls wrapped environment.
@@ -389,9 +405,10 @@ class GymEnv(Environment):
             wrapped environment.
 
         """
-        if name.startswith('_'):
+        if name.startswith("_"):
             raise AttributeError(
-                'attempted to get missing private attribute {}'.format(name))
+                "attempted to get missing private attribute {}".format(name)
+            )
         if not hasattr(self._env, name):
-            raise AttributeError('Attribute {} is not found'.format(name))
+            raise AttributeError("Attribute {} is not found".format(name))
         return getattr(self._env, name)

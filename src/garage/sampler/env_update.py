@@ -76,9 +76,9 @@ class SetTaskUpdate(EnvUpdate):
     # pylint: disable=too-few-public-methods
 
     def __init__(self, env_type, task, wrapper_constructor):
-        if not isinstance(env_type, type):
-            raise ValueError('env_type should be a type, not '
-                             f'{type(env_type)!r}')
+        # if not isinstance(env_type, type):
+        #     raise ValueError('env_type should be a type, not '
+        #                      f'{type(env_type)!r}')
         self._env_type = env_type
         self._task = task
         self._wrapper_cons = wrapper_constructor

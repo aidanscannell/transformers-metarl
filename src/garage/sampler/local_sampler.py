@@ -116,7 +116,7 @@ class LocalSampler(Sampler):
         idx_offset = 0
         while True:
             for worker in self._workers:
-                batch = worker.rollout(deterministic)
+                batch = worker.rollout()
                 # batch = worker.rollout(deterministic, idx_offset=idx_offset)
                 completed_samples += len(batch.actions)
                 batches.append(batch)

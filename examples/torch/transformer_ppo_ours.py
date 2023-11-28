@@ -3,7 +3,7 @@
 # pylint: disable=no-value-for-parameter
 from dataclasses import dataclass
 
-import click
+# import click
 import d4rl  # need to get envs into gym.make()
 import gym
 import hydra
@@ -166,9 +166,21 @@ class MassDampingENV(gym.Env):
         self._reset(ind=task)
 
 
-class HopperMediumV2(MassDampingENV):
+class HopperV2(MassDampingENV):
     def __init__(self, task=0):
         env = gym.make("hopper-medium-v2")
+        super().__init__(env=env, task_idx=task)
+
+
+class HalfCheetahV2(MassDampingENV):
+    def __init__(self, task=0):
+        env = gym.make("half-cheetah-medium-v2")
+        super().__init__(env=env, task_idx=task)
+
+
+class Walker2DV2(MassDampingENV):
+    def __init__(self, task=0):
+        env = gym.make("walker2d-medium-v2")
         super().__init__(env=env, task_idx=task)
 
 
@@ -186,17 +198,17 @@ def count_parameters(model):
     return total_params
 
 
-def get_env(env_name):
-    try:
-        m = __import__("garage")
-        m = getattr(m, "envs")
-        m = getattr(m, "mujoco")
-        return getattr(m, env_name)
-    except:
-        m = __import__("garage")
-        m = getattr(m, "envs")
-        # m = getattr(m, "metaworld")
-        return getattr(m, env_name)
+# def get_env(env_name):
+#     try:
+#         m = __import__("garage")
+#         m = getattr(m, "envs")
+#         m = getattr(m, "mujoco")
+#         return getattr(m, env_name)
+#     except:
+#         m = __import__("garage")
+#         m = getattr(m, "envs")
+#         # m = getattr(m, "metaworld")
+#         return getattr(m, env_name)
 
 
 # @click.command()
@@ -530,18 +542,6 @@ def transformer_ppo_halfcheetah(
 
 @dataclass
 class TrainConfig:
-    # defaults: List[Any] = field(
-    #     default_factory=lambda: [
-    #         {"agent": "ddpg"},
-    #         {"env": "cartpole_swingup"},
-    #         # {
-    #         #     "override hydra/launcher": "triton_config",  # Use slurm (on cluster) for multirun
-    #         # "override hydra/launcher": "slurm",  # Use slurm (on cluster) for multirun
-    #         # "override hydra/launcher": "triton_config",  # Use slurm (on cluster) for multirun
-    #         # },
-    #     ]
-    # )
-
     _target_: str = "__main__.transformer_ppo_halfcheetah"
     env_name: str = "HalfCheetah"
     seed: int = 1

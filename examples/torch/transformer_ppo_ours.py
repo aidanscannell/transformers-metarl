@@ -94,7 +94,7 @@ from garage import wrap_experiment
 
 class MassDampingENV(gym.Env):
     # class HopperMediumV2(gym.Env):
-    def __init__(self, env, task_idx):
+    def __init__(self, env, task_idx: int = 0):
         self._env = env
         self.action_space = env.action_space
         self.observation_space = env.observation_space
@@ -163,7 +163,7 @@ class MassDampingENV(gym.Env):
 
 
 class HopperMediumV2(MassDampingENV):
-    def __init__(self, task=None):
+    def __init__(self, task=0):
         env = gym.make("hopper-medium-v2")
         super().__init__(env=env, task_idx=task)
 

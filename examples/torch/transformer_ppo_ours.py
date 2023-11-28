@@ -2,16 +2,16 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 import click
-import d4rl  # need to get envs into gym.make()
 import gym
-import numpy as np
-import numpy
 from prettytable import PrettyTable
-import sa
 import torch
 
+import numpy as np
+import d4rl  # need to get envs into gym.make()
 from garage.envs import GymEnv
 from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
+
+# from garage.envs.metaworld import ML1Env
 from garage.experiment import OnlineMetaEvaluator  # MetaEvaluator,
 from garage.experiment import Snapshotter, task_sampler
 from garage.experiment.deterministic import set_seed

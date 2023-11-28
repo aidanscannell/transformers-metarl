@@ -2,35 +2,86 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 import click
+import gym
+from prettytable import PrettyTable
 import torch
-from garage.torch import set_gpu_mode
 
-from garage import wrap_experiment
 from garage.envs import GymEnv
-
-# from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
+from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
 
 # from garage.envs.metaworld import ML1Env
-from garage.experiment import (
-    task_sampler,
-    # MetaEvaluator,
-    OnlineMetaEvaluator,
-    Snapshotter,
-)
+from garage.experiment import OnlineMetaEvaluator  # MetaEvaluator,
+from garage.experiment import Snapshotter, task_sampler
 from garage.experiment.deterministic import set_seed
 from garage.sampler import LocalSampler
-from garage.trainer import Trainer
 from garage.torch.algos import RL2PPO
 from garage.torch.algos.rl2 import RL2Env, RL2Worker
-from garage.torch.policies import (
-    GaussianTransformerPolicy,
-    GaussianTransformerEncoderPolicy,
+from garage.torch.policies import (  # GaussianMLPPolicy,
     GaussianMemoryTransformerPolicy,
-    # GaussianMLPPolicy,
+    GaussianTransformerEncoderPolicy,
+    GaussianTransformerPolicy,
 )
+from garage.torch import set_gpu_mode
 from garage.torch.value_functions import GaussianMLPValueFunction
+from garage.trainer import Trainer
+from garage import wrap_experiment
 
-from prettytable import PrettyTable
+
+class MassDampingENV(gym.Env):
+    def __init__(self, env):
+        self._env = env
+        self.action_space = env.action_space
+        self.observation_space = env.observation_space
+        self.mass_ratios = (0.75, 0.85, 1, 1.15, 1.25)
+        self.damping_ratios = (0.75, 0.85, 1, 1.15, 1.25)
+        self.original_body_mass = env.env.wrapped_env.model.body_mass.copy()
+        self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
+
+    # ind is from 0 to 24
+    def reset(self, ind):
+        model = self._env.env.wrapped_env.model
+        n_link = model.body_mass.shape[0]
+        ind_mass = ind // 5
+        ind_damp = ind % 5
+        for i in range(n_link):
+            model.body_mass[i] = self.original_body_mass[i] * self.mass_ratios[ind_mass]
+            model.dof_damping[i] = (
+                self.original_damping[i] * self.damping_ratios[ind_damp]
+            )
+        return self._env.reset()
+
+    def step(self, action):
+        return self._env.step(action)
+
+    def get_normalized_score(self, score):
+        return self._env.get_normalized_score(score)
+
+    def sample_tasks(self, num_tasks):
+        """Sample a list of `num_tasks` tasks.
+
+        Args:
+            num_tasks (int): Number of tasks to sample.
+
+        Returns:
+            list[dict[str, float]]: A list of "tasks," where each task is a
+                dictionary containing a single key, "direction", mapping to -1
+                or 1.
+
+        """
+        num_tasks = 24
+        task_idxs = np.arange(num_tasks)
+        tasks = np.random.choice(task_idxs, 2)
+        return tasks
+
+    def set_task(self, task):
+        """Reset with a task.
+
+        Args:
+            task (dict[str, float]): A task (a dictionary containing a single
+                key, "direction", mapping to -1 or 1).
+
+        """
+        self.reset(ind=task)
 
 
 def count_parameters(model):
@@ -195,12 +246,28 @@ def transformer_ppo_halfcheetah(
         value_function = data["algo"].value_function
 
     trainer = Trainer(ctxt)
-    env_class = get_env(env_name)
+    # env_class = get_env(env_name)
+    # env_class = MassDampingENV
+    env_class = HalfCheetahVelEnv
+
+    def env_wrapper(env, *args):
+        env = MassDampingENV(env)
+        # wrapper = lambda env, _: normalize(
+        #     GymEnv(env, max_episode_length=max_episode_length)
+        # )
+        task = 0
+        # env = wrapper(env, task)
+        env.reset(task)  # between 0 and 24
+        env = RL2Env(GymEnv(env, max_episode_length=max_episode_length))
+        return env
+
+    #
     tasks = task_sampler.SetTaskSampler(
         env_class,
-        wrapper=lambda env, _: RL2Env(
-            GymEnv(env, max_episode_length=max_episode_length)
-        ),
+        wrapper=env_wrapper,
+        # wrapper=lambda env, _: RL2Env(
+        #     GymEnv(env, max_episode_length=max_episode_length)
+        # ),
     )
 
     env_spec = RL2Env(GymEnv(env_class(), max_episode_length=max_episode_length)).spec

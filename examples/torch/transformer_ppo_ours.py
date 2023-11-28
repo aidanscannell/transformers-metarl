@@ -587,7 +587,7 @@ class TrainConfig:
 
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
-    return hydra.utils.istantiate(transformer_ppo_halfcheetah, cfg)
+    return hydra.utils.instantiate(transformer_ppo_halfcheetah, cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,
     #     seed=1,

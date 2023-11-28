@@ -350,8 +350,15 @@ def transformer_ppo_halfcheetah(
     trainer = Trainer(ctxt)
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
-    env_class = HalfCheetahVelEnv
-    env_class = HopperMediumV2
+    # env_class = HalfCheetahVelEnv
+    if env_name in "HopperV2":
+        env_class = HopperV2
+    elif env_name in "HalfCheetahV2":
+        env_class = HalfCheetahV2
+    elif env_name in "Walker2DV2":
+        env_class = Walker2DV2
+    else:
+        raise NotImplementedError("Only HopperV2/HalfCheetahV2/Walker2DV2 accpeted")
 
     env_name = "hopper-medium-v2"
     # env = gym.make(env_name)

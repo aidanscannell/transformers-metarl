@@ -91,12 +91,6 @@ from garage import wrap_experiment
 #     self.reset(ind=task)
 
 
-class HopperMediumV2(gym.Env):
-    def __init__(self):
-        env = gym.make("hopper-medium-v2")
-        super().__init__(env=env)
-
-
 class MassDampingENV(gym.Env):
     # class HopperMediumV2(gym.Env):
     def __init__(self, env):
@@ -160,6 +154,12 @@ class MassDampingENV(gym.Env):
 
         """
         self._reset(ind=task)
+
+
+class HopperMediumV2(MassDampingENV):
+    def __init__(self):
+        env = gym.make("hopper-medium-v2")
+        super().__init__(env=env)
 
 
 def count_parameters(model):

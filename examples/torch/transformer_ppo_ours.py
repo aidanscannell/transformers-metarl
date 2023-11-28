@@ -6,6 +6,7 @@ import gym
 from prettytable import PrettyTable
 import torch
 
+import d4rl  # need to get envs into gym.make()
 from garage.envs import GymEnv
 from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
 
@@ -249,6 +250,8 @@ def transformer_ppo_halfcheetah(
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
     env_class = HalfCheetahVelEnv
+
+    env_name = "hopper-medium-v2"
 
     def env_wrapper(env, *args):
         env = MassDampingENV(env)

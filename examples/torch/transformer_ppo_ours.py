@@ -614,7 +614,7 @@ cs.store(name="train_config", node=TrainConfig)
 def hydra_wrapper(cfg: TrainConfig):
     print(f"cfg {cfg}")
     # return hydra.utils.instantiate(cfg)
-    # return transformer_ppo_halfcheetah(
+    return transformer_ppo_halfcheetah(
         env_name=cfg.env_name,
         seed=cfg.seed,
         max_episode_length=cfg.max_episode_length,

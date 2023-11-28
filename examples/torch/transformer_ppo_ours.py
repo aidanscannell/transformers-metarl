@@ -524,4 +524,9 @@ def transformer_ppo_halfcheetah(
     )
 
 
-transformer_ppo_halfcheetah()
+def hydra_wrapper():
+    return transformer_ppo_halfcheetah()
+
+
+if __name__ == "__main__":
+    hydra_wrapper()

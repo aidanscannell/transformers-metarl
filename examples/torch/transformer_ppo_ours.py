@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
-import click
 from dataclasses import dataclass
-from typig import Optional
-import hydra
+
+import click
+import d4rl  # need to get envs into gym.make()
 import gym
+import hydra
+import numpy as np
 from prettytable import PrettyTable
 import torch
+from typing import Optional
 
-from garage import EnvSpec
-import numpy as np
-import d4rl  # need to get envs into gym.make()
+from garage import EnvSpec, wrap_experiment
 from garage.envs import GymEnv
 from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
 
@@ -30,8 +31,6 @@ from garage.torch.policies import (  # GaussianMLPPolicy,
 from garage.torch import set_gpu_mode
 from garage.torch.value_functions import GaussianMLPValueFunction
 from garage.trainer import Trainer
-from garage import wrap_experiment
-
 
 # class MassDampingENV(gym.Env):
 # def __init__(self, env):

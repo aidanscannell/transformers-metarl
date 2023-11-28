@@ -116,7 +116,7 @@ class MassDampingENV(gym.Env):
     def reset(self):
         ind = np.random.choice(self.task_idxs, 1)
         print(f"ind {ind}")
-        self._reset(ind=ind)
+        return self._reset(ind=ind)
 
     def _reset(self, ind):
         if isinstance(ind, np.ndarray):

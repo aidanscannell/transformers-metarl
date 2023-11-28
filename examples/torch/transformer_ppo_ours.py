@@ -2,6 +2,8 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 import click
+from dataclasses import dataclass
+import hydra
 import gym
 from prettytable import PrettyTable
 import torch
@@ -526,8 +528,121 @@ def transformer_ppo_halfcheetah(
     )
 
 
-def hydra_wrapper():
-    return transformer_ppo_halfcheetah()
+@dataclass
+class TrainConfig:
+    env_name = ""
+    seed = 1
+    max_episode_length = 200
+    meta_batch_size = 20
+    n_epochs = 5000
+    episode_per_task = 2
+    wm_embedding_hidden_size = 32
+    n_heads = 1
+    d_model = 4
+    layers = 2
+    dropout = 0.0
+    wm_size = 2
+    em_size = 1
+    dim_ff = 16
+    discount = 0.99
+    gae_lambda = 0.95
+    lr_clip_range = 0.2
+    policy_lr = 2.5e-4
+    vf_lr = 2.5e-4
+    minibatch_size = 32
+    max_opt_epochs = 10
+    center_adv = True
+    positive_adv = True
+    policy_ent_coeff = 0.02
+    use_softplus_entropy = True
+    stop_entropy_gradient = True
+    entropy_method = "regularized"
+    share_network = True
+    architecture = ("Encoder",)
+    policy_head_input = "latest_memory"
+    dropatt = 0.0
+    attn_type = 1
+    pre_lnorm = True
+    init_params = True
+    gating = "residual"
+    init_std = 1.0
+    learn_std = True
+    policy_head_type = "Default"
+    policy_lr_schedule = "no_schedule"
+    vf_lr_schedule = "no_schedule"
+    decay_epoch_init = 500
+    decay_epoch_end = 1000
+    min_lr_factor = 0.1
+    tfixup = True
+    remove_ln = True
+    recurrent_policy = True
+    pretrained_dir = None
+    pretrained_epoch = 4980
+    output_weights_scale = 1.0
+    normalized_wm = True
+    annealing_std = True
+    min_std = 1e-6
+    gpu_id = 0
+
+
+@hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
+def hydra_wrapper(cfg: TrainConfig):
+    return hydra.utils.istantiate(transformer_ppo_halfcheetah, cfg)
+    # return transformer_ppo_halfcheetah(
+    #     env_name=cfg.env_name,
+    #     seed=1,
+    #     max_episode_length=200,
+    #     meta_batch_size=20,
+    #     n_epochs=5000,
+    #     episode_per_task=2,
+    #     wm_embedding_hidden_size=32,
+    #     n_heads=1,
+    #     d_model=4,
+    #     layers=2,
+    #     dropout=0.0,
+    #     wm_size=2,
+    #     em_size=1,
+    #     dim_ff=16,
+    #     discount=0.99,
+    #     gae_lambda=0.95,
+    #     lr_clip_range=0.2,
+    #     policy_lr=2.5e-4,
+    #     vf_lr=2.5e-4,
+    #     minibatch_size=32,
+    #     max_opt_epochs=10,
+    #     center_adv=True,
+    #     positive_adv=True,
+    #     policy_ent_coeff=0.02,
+    #     use_softplus_entropy=True,
+    #     stop_entropy_gradient=True,
+    #     entropy_method="regularized",
+    #     share_network=True,
+    #     architecture="Encoder",
+    #     policy_head_input="latest_memory",
+    #     dropatt=0.0,
+    #     attn_type=1,
+    #     pre_lnorm=True,
+    #     init_params=True,
+    #     gating="residual",
+    #     init_std=1.0,
+    #     learn_std=True,
+    #     policy_head_type="Default",
+    #     policy_lr_schedule="no_schedule",
+    #     vf_lr_schedule="no_schedule",
+    #     decay_epoch_init=500,
+    #     decay_epoch_end=1000,
+    #     min_lr_factor=0.1,
+    #     tfixup=True,
+    #     remove_ln=True,
+    #     recurrent_policy=True,
+    #     pretrained_dir=None,
+    #     pretrained_epoch=4980,
+    #     output_weights_scale=1.0,
+    #     normalized_wm=True,
+    #     annealing_std=True,
+    #     min_std=1e-6,
+    #     gpu_id=0,
+    # )
 
 
 if __name__ == "__main__":

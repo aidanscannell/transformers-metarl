@@ -613,6 +613,7 @@ cs.store(name="train_config", node=TrainConfig)
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
     print(f"cfg {cfg}")
+    breakpoint()
     return hydra.utils.instantiate(cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,

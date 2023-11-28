@@ -358,6 +358,8 @@ def transformer_ppo_halfcheetah(
         env_class = HalfCheetahV2
     elif env_name in "Walker2DV2":
         env_class = Walker2DV2
+    elif env_name in "HalfCheetahVelEnv":
+        env_class = HalfCheetahVelEnv
     else:
         raise NotImplementedError("Only HopperV2/HalfCheetahV2/Walker2DV2 accpeted")
 

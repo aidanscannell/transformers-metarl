@@ -2,15 +2,15 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 from dataclasses import dataclass
+from typing import Optional
 
-# import click
 import d4rl  # need to get envs into gym.make()
 import gym
 import hydra
 import numpy as np
+from omegaconf import OmegaConf
 from prettytable import PrettyTable
 import torch
-from typing import Optional
 
 from garage import EnvSpec, wrap_experiment
 from garage.envs import GymEnv
@@ -548,7 +548,7 @@ def transformer_ppo_halfcheetah(
 
 @dataclass
 class TrainConfig:
-    _target_: str = "__main__.transformer_ppo_halfcheetah"
+    # _target_: str = "__main__.transformer_ppo_halfcheetah"
     env_name: str = "HalfCheetah"
     seed: int = 1
     max_episode_length: int = 200
@@ -613,8 +613,11 @@ cs.store(name="train_config", node=TrainConfig)
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
     print(f"cfg {cfg}")
+    cfg_dict = OmegaConf.to_container(cfg)
+    # cfg_dict.pop("_target_")
     breakpoint()
-    return hydra.utils.instantiate(cfg)
+    return transformer_ppo_halfcheetah(**cfg_dict)
+    # return hydra.utils.instantiate(cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,
     #     seed=cfg.seed,

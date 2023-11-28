@@ -485,8 +485,9 @@ def transformer_ppo_halfcheetah(
 
     meta_evaluator = OnlineMetaEvaluator(
         test_task_sampler=tasks,
-        n_test_tasks=30,
-        n_test_episodes=1,
+        n_test_tasks=1,
+        n_test_episodes=20,
+        prefix="MetaTestAdapt",
         worker_class=RL2Worker,
         worker_args=dict(n_episodes_per_trial=2),
     )

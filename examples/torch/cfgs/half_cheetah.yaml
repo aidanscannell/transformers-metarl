@@ -4,7 +4,7 @@ defaults:
   - _self_
 
 _target_: "__main__.transformer_ppo_halfcheetah"
-env_name: "HalfCheetah"
+env_name: "HalfCheetahV2"
 wm_embedding_hidden_size: 32
 n_heads: 16
 d_model: 128
@@ -26,8 +26,8 @@ entropy_method: "regularized"
 architecture: "Encoder"
 policy_head_input: "latest_memory"
 init_std: 0.5
-remove_ln: true
-# tfixup: true
+# remove_ln: true # setting true breaks with is_causal
+tfixup: true
 learn_std: true
 pre_lnorm: true
 init_params: true

@@ -119,6 +119,8 @@ class MassDampingENV(gym.Env):
         self._reset(ind=ind)
 
     def _reset(self, ind):
+        if isinstance(ind, np.array):
+            ind = ind.item()
         model = self._env.env.wrapped_env.model
         n_link = model.body_mass.shape[0]
         ind_mass = ind // 5

@@ -103,7 +103,7 @@ class MassDampingENV(gym.Env):
         self.original_body_mass = env.env.wrapped_env.model.body_mass.copy()
         self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
 
-        self.num_tasks = 24
+        self.num_tasks = 25
         self.task_idxs = np.arange(self.num_tasks)
         self.task_idx = task_idx
         self._reset(ind=self.task_idx)
@@ -115,7 +115,7 @@ class MassDampingENV(gym.Env):
     # ind is from 0 to 24
     def reset(self):
         ind = np.random.choice(self.task_idxs, 1)
-        print(f"ind {ind}")
+        # print(f"ind {ind}")
         return self._reset(ind=ind)
 
     def _reset(self, ind):

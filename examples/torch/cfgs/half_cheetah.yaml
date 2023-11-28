@@ -1,3 +1,8 @@
+defaults:
+  - train_config
+  - override hydra/launcher: slurm
+  - _self_
+
 env_name: "HalfCheetah"
 wm_embedding_hidden_size: 32
 n_heads: 16
@@ -33,3 +38,15 @@ decay_epoch_init: 100
 decay_epoch_end: 3700
 min_lr_factor: 0.0001
 policy_head_type: "Default"
+
+hydra:
+  run:
+    dir: output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    chdir: true
+  sweep:
+    dir: ${hydra.run.dir}
+    subdir: ${hydra.job.num}
+  job_logging:
+    root:
+      level: INFO # DEBUG

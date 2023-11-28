@@ -530,6 +530,7 @@ def transformer_ppo_halfcheetah(
 
 @dataclass
 class TrainConfig:
+    _target_ = transformer_ppo_halfcheetah
     env_name = ""
     seed = 1
     max_episode_length = 200
@@ -585,9 +586,15 @@ class TrainConfig:
     gpu_id = 0
 
 
+from hydra.core.config_store import ConfigStore
+
+cs = ConfigStore.instance()
+cs.store(name="train_config", node=TrainConfig)
+
+
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
-    return hydra.utils.instantiate(transformer_ppo_halfcheetah, cfg)
+    return hydra.utils.instantiate(cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,
     #     seed=1,

@@ -6,6 +6,7 @@ import gym
 from prettytable import PrettyTable
 import torch
 
+from garage import EnvSpec
 import numpy as np
 import d4rl  # need to get envs into gym.make()
 from garage.envs import GymEnv
@@ -93,7 +94,7 @@ from garage import wrap_experiment
 
 class MassDampingENV(gym.Env):
     # class HopperMediumV2(gym.Env):
-    def __init__(self, env):
+    def __init__(self, env, task_idx):
         self._env = env
         self.action_space = env.action_space
         self.observation_space = env.observation_space
@@ -102,11 +103,18 @@ class MassDampingENV(gym.Env):
         self.original_body_mass = env.env.wrapped_env.model.body_mass.copy()
         self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
 
+        self.num_tasks = 24
+        self.task_idxs = np.arange(self.num_tasks)
+        self.task_idx = task_idx
+        self._reset(ind=self.task_idx)
+
+        # self.spec = EnvSpec(
+        #     action_space=self.action_space, observation_space=self.observation_space
+        # )
+
     # ind is from 0 to 24
     def reset(self):
-        num_tasks = 24
-        task_idxs = np.arange(num_tasks)
-        ind = np.random.choice(task_idxs, 2)
+        ind = np.random.choice(self.task_idxs, 1)
         print(f"ind {ind}")
         self._reset(ind=ind)
 
@@ -140,9 +148,7 @@ class MassDampingENV(gym.Env):
                 or 1.
 
         """
-        num_tasks = 24
-        task_idxs = np.arange(num_tasks)
-        tasks = np.random.choice(task_idxs, 2)
+        tasks = np.random.choice(self.task_idxs, num_tasks)
         return tasks
 
     def set_task(self, task):
@@ -157,9 +163,9 @@ class MassDampingENV(gym.Env):
 
 
 class HopperMediumV2(MassDampingENV):
-    def __init__(self):
+    def __init__(self, task=None):
         env = gym.make("hopper-medium-v2")
-        super().__init__(env=env)
+        super().__init__(env=env, task_idx=task)
 
 
 def count_parameters(model):

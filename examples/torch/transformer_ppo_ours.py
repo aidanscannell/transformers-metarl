@@ -327,7 +327,7 @@ def transformer_ppo_halfcheetah(
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
     env_class = HalfCheetahVelEnv
-    # env_class = HopperMediumV2
+    env_class = HopperMediumV2
 
     env_name = "hopper-medium-v2"
     # env = gym.make(env_name)

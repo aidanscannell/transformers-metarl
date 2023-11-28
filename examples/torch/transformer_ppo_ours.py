@@ -249,11 +249,19 @@ def transformer_ppo_halfcheetah(
     trainer = Trainer(ctxt)
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
-    env_class = HalfCheetahVelEnv
+    # env_class = HalfCheetahVelEnv
 
     env_name = "hopper-medium-v2"
+    env = gym.make(env_name)
+
+    def make_env():
+        env = gym.make(env_name)
+        env = MassDampingENV(env)
+        env.reset(0)  # between 0 and 24
+        return env
 
     def env_wrapper(env, *args):
+        env = RL2Env(GymEnv(env, max_episode_length=max_episode_length))
         env = MassDampingENV(env)
         # wrapper = lambda env, _: normalize(
         #     GymEnv(env, max_episode_length=max_episode_length)
@@ -261,19 +269,19 @@ def transformer_ppo_halfcheetah(
         task = 0
         # env = wrapper(env, task)
         env.reset(task)  # between 0 and 24
-        env = RL2Env(GymEnv(env, max_episode_length=max_episode_length))
         return env
 
     #
     tasks = task_sampler.SetTaskSampler(
-        env_class,
+        # env_class,
+        make_env,
         wrapper=env_wrapper,
         # wrapper=lambda env, _: RL2Env(
         #     GymEnv(env, max_episode_length=max_episode_length)
         # ),
     )
 
-    env_spec = RL2Env(GymEnv(env_class(), max_episode_length=max_episode_length)).spec
+    env_spec = RL2Env(GymEnv(env, max_episode_length=max_episode_length)).spec
 
     if annealing_std:
         annealing_rate = (min_std / init_std) ** (

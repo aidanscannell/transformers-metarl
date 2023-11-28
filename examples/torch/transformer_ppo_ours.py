@@ -29,7 +29,76 @@ from garage.trainer import Trainer
 from garage import wrap_experiment
 
 
+# class MassDampingENV(gym.Env):
+# def __init__(self, env):
+#     self._env = env
+#     self.action_space = env.action_space
+#     self.observation_space = env.observation_space
+#     self.mass_ratios = (0.75, 0.85, 1, 1.15, 1.25)
+#     self.damping_ratios = (0.75, 0.85, 1, 1.15, 1.25)
+#     self.original_body_mass = env.env.wrapped_env.model.body_mass.copy()
+#     self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
+
+# # ind is from 0 to 24
+# def reset(self, ind=None):
+#     if ind is None:
+#         num_tasks = 24
+#         task_idxs = np.arange(num_tasks)
+#         ind = np.random.choice(task_idxs, 2)
+#         print(f"ind {ind}")
+#     model = self._env.env.wrapped_env.model
+#     n_link = model.body_mass.shape[0]
+#     ind_mass = ind // 5
+#     ind_damp = ind % 5
+#     for i in range(n_link):
+#         model.body_mass[i] = self.original_body_mass[i] * self.mass_ratios[ind_mass]
+#         model.dof_damping[i] = (
+#             self.original_damping[i] * self.damping_ratios[ind_damp]
+#         )
+#     return self._env.reset()
+
+# def step(self, action):
+#     return self._env.step(action)
+
+# def get_normalized_score(self, score):
+#     return self._env.get_normalized_score(score)
+
+# def sample_tasks(self, num_tasks):
+#     """Sample a list of `num_tasks` tasks.
+
+#     Args:
+#         num_tasks (int): Number of tasks to sample.
+
+#     Returns:
+#         list[dict[str, float]]: A list of "tasks," where each task is a
+#             dictionary containing a single key, "direction", mapping to -1
+#             or 1.
+
+#     """
+#     num_tasks = 24
+#     task_idxs = np.arange(num_tasks)
+#     tasks = np.random.choice(task_idxs, 2)
+#     return tasks
+
+# def set_task(self, task):
+#     """Reset with a task.
+
+#     Args:
+#         task (dict[str, float]): A task (a dictionary containing a single
+#             key, "direction", mapping to -1 or 1).
+
+#     """
+#     self.reset(ind=task)
+
+
+class HopperMediumV2(gym.Env):
+    def __init__(self):
+        env = gym.make("hopper-medium-v2")
+        super().__init__(env=env)
+
+
 class MassDampingENV(gym.Env):
+    # class HopperMediumV2(gym.Env):
     def __init__(self, env):
         self._env = env
         self.action_space = env.action_space
@@ -40,12 +109,14 @@ class MassDampingENV(gym.Env):
         self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
 
     # ind is from 0 to 24
-    def reset(self, ind=None):
-        if ind is None:
-            num_tasks = 24
-            task_idxs = np.arange(num_tasks)
-            ind = np.random.choice(task_idxs, 2)
-            print(f"ind {ind}")
+    def reset(self):
+        num_tasks = 24
+        task_idxs = np.arange(num_tasks)
+        ind = np.random.choice(task_idxs, 2)
+        print(f"ind {ind}")
+        self._reset(ind=ind)
+
+    def _reset(self, ind):
         model = self._env.env.wrapped_env.model
         n_link = model.body_mass.shape[0]
         ind_mass = ind // 5
@@ -88,7 +159,7 @@ class MassDampingENV(gym.Env):
                 key, "direction", mapping to -1 or 1).
 
         """
-        self.reset(ind=task)
+        self._reset(ind=task)
 
 
 def count_parameters(model):
@@ -256,15 +327,16 @@ def transformer_ppo_halfcheetah(
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
     # env_class = HalfCheetahVelEnv
+    env_class = HopperMediumV2
 
     env_name = "hopper-medium-v2"
-    env = gym.make(env_name)
+    # env = gym.make(env_name)
 
-    def make_env():
-        env = gym.make(env_name)
-        env = MassDampingENV(env)
-        # env.reset(0)  # between 0 and 24
-        return env
+    # def make_env():
+    #     env = gym.make(env_name)
+    #     env = MassDampingENV(env)
+    #     # env.reset(0)  # between 0 and 24
+    #     return env
 
     def env_wrapper(env, *args):
         env = RL2Env(GymEnv(env, max_episode_length=max_episode_length))
@@ -272,22 +344,21 @@ def transformer_ppo_halfcheetah(
         # wrapper = lambda env, _: normalize(
         #     GymEnv(env, max_episode_length=max_episode_length)
         # )
-        task = 0
+        # task = 0
         # env = wrapper(env, task)
-        env.reset(task)  # between 0 and 24
+        # env.reset(task)  # between 0 and 24
         return env
 
-    #
     tasks = task_sampler.SetTaskSampler(
-        # env_class,
-        make_env,
+        env_class,
+        # make_env,
         wrapper=env_wrapper,
         # wrapper=lambda env, _: RL2Env(
         #     GymEnv(env, max_episode_length=max_episode_length)
         # ),
     )
 
-    env_spec = RL2Env(GymEnv(env, max_episode_length=max_episode_length)).spec
+    env_spec = RL2Env(GymEnv(env_class(), max_episode_length=max_episode_length)).spec
     print(f"env_spec {env_spec}")
 
     if annealing_std:

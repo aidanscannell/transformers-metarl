@@ -617,7 +617,7 @@ def hydra_wrapper(cfg: TrainConfig):
     cfg_dict = OmegaConf.to_container(cfg)
     # cfg_dict.pop("_target_")
     breakpoint()
-    return transformer_ppo_halfcheetah(**cfg_dict)
+    return transformer_ppo_halfcheetah(env_name=cfg.env_name, seed=cfg.seed)
     # return hydra.utils.instantiate(cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,

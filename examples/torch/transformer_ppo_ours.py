@@ -40,7 +40,12 @@ class MassDampingENV(gym.Env):
         self.original_damping = env.env.wrapped_env.model.dof_damping.copy()
 
     # ind is from 0 to 24
-    def reset(self, ind):
+    def reset(self, ind=None):
+        if ind is None:
+            num_tasks = 24
+            task_idxs = np.arange(num_tasks)
+            ind = np.random.choice(task_idxs, 2)
+            print(f"ind {ind}")
         model = self._env.env.wrapped_env.model
         n_link = model.body_mass.shape[0]
         ind_mass = ind // 5
@@ -257,13 +262,13 @@ def transformer_ppo_halfcheetah(
 
     def make_env():
         env = gym.make(env_name)
-        # env = MassDampingENV(env)
+        env = MassDampingENV(env)
         # env.reset(0)  # between 0 and 24
         return env
 
     def env_wrapper(env, *args):
         env = RL2Env(GymEnv(env, max_episode_length=max_episode_length))
-        env = MassDampingENV(env)
+        # env = MassDampingENV(env)
         # wrapper = lambda env, _: normalize(
         #     GymEnv(env, max_episode_length=max_episode_length)
         # )
@@ -283,6 +288,7 @@ def transformer_ppo_halfcheetah(
     )
 
     env_spec = RL2Env(GymEnv(env, max_episode_length=max_episode_length)).spec
+    print(f"env_spec {env_spec}")
 
     if annealing_std:
         annealing_rate = (min_std / init_std) ** (

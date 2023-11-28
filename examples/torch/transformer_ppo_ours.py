@@ -174,7 +174,7 @@ class HopperV2(MassDampingENV):
 
 class HalfCheetahV2(MassDampingENV):
     def __init__(self, task=0):
-        env = gym.make("half-cheetah-medium-v2")
+        env = gym.make("halfcheetah-medium-v2")
         super().__init__(env=env, task_idx=task)
 
 

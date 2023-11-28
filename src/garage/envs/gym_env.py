@@ -185,7 +185,7 @@ class GymEnv(Environment):
         """list: A list of string representing the supported render modes."""
         return self._render_modes
 
-    def reset(self):
+    def reset(self, *args, **kwargs):
         """Call reset on wrapped env.
 
         Returns:
@@ -198,7 +198,7 @@ class GymEnv(Environment):
                 goal-conditioned or MTRL.)
 
         """
-        first_obs = self._env.reset()
+        first_obs = self._env.reset(*args, **kwargs)
         self._step_cnt = 0
         self._env_info = None
 

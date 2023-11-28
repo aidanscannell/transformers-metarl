@@ -3,6 +3,7 @@
 # pylint: disable=no-value-for-parameter
 import click
 from dataclasses import dataclass
+from typig import Optional
 import hydra
 import gym
 from prettytable import PrettyTable
@@ -589,7 +590,7 @@ class TrainConfig:
     tfixup: bool = True
     remove_ln: bool = True
     recurrent_policy: bool = True
-    pretrained_dir: str = None
+    pretrained_dir: Optional[str] = None
     pretrained_epoch: int = 4980
     output_weights_scale: float = 1.0
     normalized_wm: bool = True

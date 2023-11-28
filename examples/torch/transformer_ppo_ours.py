@@ -326,8 +326,8 @@ def transformer_ppo_halfcheetah(
     trainer = Trainer(ctxt)
     # env_class = get_env(env_name)
     # env_class = MassDampingENV
-    # env_class = HalfCheetahVelEnv
-    env_class = HopperMediumV2
+    env_class = HalfCheetahVelEnv
+    # env_class = HopperMediumV2
 
     env_name = "hopper-medium-v2"
     # env = gym.make(env_name)
@@ -352,10 +352,10 @@ def transformer_ppo_halfcheetah(
     tasks = task_sampler.SetTaskSampler(
         env_class,
         # make_env,
-        wrapper=env_wrapper,
-        # wrapper=lambda env, _: RL2Env(
-        #     GymEnv(env, max_episode_length=max_episode_length)
-        # ),
+        # wrapper=env_wrapper,
+        wrapper=lambda env, _: RL2Env(
+            GymEnv(env, max_episode_length=max_episode_length)
+        ),
     )
 
     env_spec = RL2Env(GymEnv(env_class(), max_episode_length=max_episode_length)).spec

@@ -257,8 +257,8 @@ def transformer_ppo_halfcheetah(
 
     def make_env():
         env = gym.make(env_name)
-        env = MassDampingENV(env)
-        env.reset(0)  # between 0 and 24
+        # env = MassDampingENV(env)
+        # env.reset(0)  # between 0 and 24
         return env
 
     def env_wrapper(env, *args):

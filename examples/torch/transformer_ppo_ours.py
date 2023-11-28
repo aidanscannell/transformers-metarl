@@ -213,7 +213,8 @@ def count_parameters(model):
 
 
 @click.command()
-@click.option("--env_name", default="ML1ReachEnv")
+# @click.option("--env_name", default="ML1ReachEnv")
+@click.option("--env_name", default="HalfCheetahV2")
 @click.option("--seed", default=1)
 @click.option("--max_episode_length", default=200)
 @click.option("--meta_batch_size", default=20)

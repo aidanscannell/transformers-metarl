@@ -214,8 +214,8 @@ def count_parameters(model):
 
 @click.command()
 # @click.option("--env_name", default="ML1ReachEnv")
-@click.argument("--env_name", default="HalfCheetahV2")
-@click.argument("--seed", default=1)
+@click.option("--env_name", default="HalfCheetahV2")
+@click.option("--seed", default=1)
 @click.option("--max_episode_length", default=200)
 @click.option("--meta_batch_size", default=20)
 @click.option("--n_epochs", default=5000)
@@ -678,4 +678,5 @@ def hydra_wrapper(cfg: TrainConfig):
 
 
 if __name__ == "__main__":
-    hydra_wrapper()
+    # hydra_wrapper()
+    transformer_ppo_halfcheetah()

@@ -321,6 +321,7 @@ def transformer_ppo_halfcheetah(
         episode_per_task (int): Number of training episode per task.
 
     """
+    print(f"wm_embedding_hidden_size {wm_embedding_hidden_size}")
     set_seed(seed)
 
     policy = None

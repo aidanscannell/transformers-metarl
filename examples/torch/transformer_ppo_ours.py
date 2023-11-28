@@ -4,7 +4,7 @@
 import click
 import d4rl  # need to get envs into gym.make()
 import gym
-import np
+import numpy as np
 import numpy
 from prettytable import PrettyTable
 import sa

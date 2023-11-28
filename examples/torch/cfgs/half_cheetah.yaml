@@ -3,6 +3,7 @@ defaults:
   - override hydra/launcher: slurm
   - _self_
 
+_target_: "__main__.transformer_ppo_halfcheetah"
 env_name: "HalfCheetah"
 wm_embedding_hidden_size: 32
 n_heads: 16

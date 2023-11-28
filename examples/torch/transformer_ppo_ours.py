@@ -530,8 +530,8 @@ def transformer_ppo_halfcheetah(
 
 @dataclass
 class TrainConfig:
-    _target_ = transformer_ppo_halfcheetah
-    env_name = ""
+    _target_ = "__main__.transformer_ppo_halfcheetah"
+    env_name = "HalfCheetah"
     seed = 1
     max_episode_length = 200
     meta_batch_size = 20

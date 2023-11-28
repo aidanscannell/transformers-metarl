@@ -585,7 +585,7 @@ class TrainConfig:
     vf_lr_schedule: str = "no_schedule"
     decay_epoch_init: int = 500
     decay_epoch_end: int = 1000
-    min_lr_factor = 0.1
+    min_lr_factor: float = 0.1
     tfixup: bool = True
     remove_ln: bool = True
     recurrent_policy: bool = True

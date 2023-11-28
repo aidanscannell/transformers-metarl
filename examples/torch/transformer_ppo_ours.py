@@ -212,61 +212,61 @@ def count_parameters(model):
 #         return getattr(m, env_name)
 
 
-@click.command()
-# @click.option("--env_name", default="ML1ReachEnv")
-@click.option("--env_name", default="HalfCheetahV2")
-@click.option("--seed", default=1)
-@click.option("--max_episode_length", default=200)
-@click.option("--meta_batch_size", default=20)
-@click.option("--n_epochs", default=5000)
-@click.option("--episode_per_task", default=2)
-@click.option("--wm_embedding_hidden_size", default=32)
-@click.option("--n_heads", default=1)
-@click.option("--d_model", default=4)
-@click.option("--layers", default=2)
-@click.option("--dropout", default=0.0)
-@click.option("--wm_size", default=2)
-@click.option("--em_size", default=1)
-@click.option("--dim_ff", default=16)
-@click.option("--discount", default=0.99)
-@click.option("--gae_lambda", default=0.95)
-@click.option("--lr_clip_range", default=0.2)
-@click.option("--policy_lr", default=2.5e-4)
-@click.option("--vf_lr", default=2.5e-4)
-@click.option("--minibatch_size", default=32)
-@click.option("--max_opt_epochs", default=10)
-@click.option("--center_adv", is_flag=True)
-@click.option("--positive_adv", is_flag=True)
-@click.option("--policy_ent_coeff", default=0.02)
-@click.option("--use_softplus_entropy", is_flag=True)
-@click.option("--stop_entropy_gradient", is_flag=True)
-@click.option("--entropy_method", default="regularized")
-@click.option("--share_network", is_flag=True)
-@click.option("--architecture", default="Encoder")
-@click.option("--policy_head_input", default="latest_memory")
-@click.option("--dropatt", default=0.0)
-@click.option("--attn_type", default=1)
-@click.option("--pre_lnorm", is_flag=True)
-@click.option("--init_params", is_flag=True)
-@click.option("--gating", default="residual")
-@click.option("--init_std", default=1.0)
-@click.option("--learn_std", is_flag=True)
-@click.option("--policy_head_type", default="Default")
-@click.option("--policy_lr_schedule", default="no_schedule")
-@click.option("--vf_lr_schedule", default="no_schedule")
-@click.option("--decay_epoch_init", default=500)
-@click.option("--decay_epoch_end", default=1000)
-@click.option("--min_lr_factor", default=0.1)
-@click.option("--tfixup", is_flag=True)
-@click.option("--remove_ln", is_flag=True)
-@click.option("--recurrent_policy", is_flag=True)
-@click.option("--pretrained_dir", default=None)
-@click.option("--pretrained_epoch", default=4980)
-@click.option("--output_weights_scale", default=1.0)
-@click.option("--normalized_wm", is_flag=True)
-@click.option("--annealing_std", is_flag=True)
-@click.option("--min_std", default=1e-6)
-@click.option("--gpu_id", default=0)
+# @click.command()
+# # @click.option("--env_name", default="ML1ReachEnv")
+# @click.option("--env_name", default="HalfCheetahV2")
+# @click.option("--seed", default=1)
+# @click.option("--max_episode_length", default=200)
+# @click.option("--meta_batch_size", default=20)
+# @click.option("--n_epochs", default=5000)
+# @click.option("--episode_per_task", default=2)
+# @click.option("--wm_embedding_hidden_size", default=32)
+# @click.option("--n_heads", default=1)
+# @click.option("--d_model", default=4)
+# @click.option("--layers", default=2)
+# @click.option("--dropout", default=0.0)
+# @click.option("--wm_size", default=2)
+# @click.option("--em_size", default=1)
+# @click.option("--dim_ff", default=16)
+# @click.option("--discount", default=0.99)
+# @click.option("--gae_lambda", default=0.95)
+# @click.option("--lr_clip_range", default=0.2)
+# @click.option("--policy_lr", default=2.5e-4)
+# @click.option("--vf_lr", default=2.5e-4)
+# @click.option("--minibatch_size", default=32)
+# @click.option("--max_opt_epochs", default=10)
+# @click.option("--center_adv", is_flag=True)
+# @click.option("--positive_adv", is_flag=True)
+# @click.option("--policy_ent_coeff", default=0.02)
+# @click.option("--use_softplus_entropy", is_flag=True)
+# @click.option("--stop_entropy_gradient", is_flag=True)
+# @click.option("--entropy_method", default="regularized")
+# @click.option("--share_network", is_flag=True)
+# @click.option("--architecture", default="Encoder")
+# @click.option("--policy_head_input", default="latest_memory")
+# @click.option("--dropatt", default=0.0)
+# @click.option("--attn_type", default=1)
+# @click.option("--pre_lnorm", is_flag=True)
+# @click.option("--init_params", is_flag=True)
+# @click.option("--gating", default="residual")
+# @click.option("--init_std", default=1.0)
+# @click.option("--learn_std", is_flag=True)
+# @click.option("--policy_head_type", default="Default")
+# @click.option("--policy_lr_schedule", default="no_schedule")
+# @click.option("--vf_lr_schedule", default="no_schedule")
+# @click.option("--decay_epoch_init", default=500)
+# @click.option("--decay_epoch_end", default=1000)
+# @click.option("--min_lr_factor", default=0.1)
+# @click.option("--tfixup", is_flag=True)
+# @click.option("--remove_ln", is_flag=True)
+# @click.option("--recurrent_policy", is_flag=True)
+# @click.option("--pretrained_dir", default=None)
+# @click.option("--pretrained_epoch", default=4980)
+# @click.option("--output_weights_scale", default=1.0)
+# @click.option("--normalized_wm", is_flag=True)
+# @click.option("--annealing_std", is_flag=True)
+# @click.option("--min_std", default=1e-6)
+# @click.option("--gpu_id", default=0)
 @wrap_experiment(snapshot_mode="gap", snapshot_gap=30)
 def transformer_ppo_halfcheetah(
     ctxt,
@@ -363,7 +363,7 @@ def transformer_ppo_halfcheetah(
     else:
         raise NotImplementedError("Only HopperV2/HalfCheetahV2/Walker2DV2 accpeted")
 
-    env_name = "hopper-medium-v2"
+    # env_name = "hopper-medium-v2"
     # env = gym.make(env_name)
 
     # def make_env():
@@ -552,60 +552,60 @@ def transformer_ppo_halfcheetah(
 
 @dataclass
 class TrainConfig:
-    # _target_: str = "__main__.transformer_ppo_halfcheetah"
+    _target_: str = "__main__.transformer_ppo_halfcheetah"
     env_name: str = "HalfCheetah"
     seed: int = 1
-    # max_episode_length: int = 200
-    # meta_batch_size: int = 20
-    # n_epochs: int = 5000
-    # episode_per_task: int = 2
-    # wm_embedding_hidden_size: int = 32
-    # n_heads: int = 1
-    # d_model: int = 4
-    # layers: int = 2
-    # dropout: float = 0.0
-    # wm_size: int = 2
-    # em_size: int = 1
-    # dim_ff: int = 16
-    # discount: float = 0.99
-    # gae_lambda: float = 0.95
-    # lr_clip_range: float = 0.2
-    # policy_lr: float = 2.5e-4
-    # vf_lr: float = 2.5e-4
-    # minibatch_size: int = 32
-    # max_opt_epochs: int = 10
-    # center_adv: bool = False
-    # positive_adv: bool = False
-    # policy_ent_coeff: float = 0.02
-    # use_softplus_entropy: bool = False
-    # stop_entropy_gradient: bool = False
-    # entropy_method: str = "regularized"
-    # share_network: bool = False
-    # architecture: str = "Encoder"
-    # policy_head_input: str = "latest_memory"
-    # dropatt: float = 0.0
-    # attn_type: int = 1
-    # pre_lnorm: bool = False
-    # init_params: bool = False
-    # gating: str = "residual"
-    # init_std: float = 1.0
-    # learn_std: bool = False
-    # policy_head_type: str = "Default"
-    # policy_lr_schedule: str = "no_schedule"
-    # vf_lr_schedule: str = "no_schedule"
-    # decay_epoch_init: int = 500
-    # decay_epoch_end: int = 1000
-    # min_lr_factor: float = 0.1
-    # tfixup: bool = False
-    # remove_ln: bool = False
-    # recurrent_policy: bool = False
-    # pretrained_dir: Optional[str] = None
-    # pretrained_epoch: int = 4980
-    # output_weights_scale: float = 1.0
-    # normalized_wm: bool = False
-    # annealing_std: bool = False
-    # min_std: float = 1e-6
-    # gpu_id: int = 0
+    max_episode_length: int = 200
+    meta_batch_size: int = 20
+    n_epochs: int = 5000
+    episode_per_task: int = 2
+    wm_embedding_hidden_size: int = 32
+    n_heads: int = 1
+    d_model: int = 4
+    layers: int = 2
+    dropout: float = 0.0
+    wm_size: int = 2
+    em_size: int = 1
+    dim_ff: int = 16
+    discount: float = 0.99
+    gae_lambda: float = 0.95
+    lr_clip_range: float = 0.2
+    policy_lr: float = 2.5e-4
+    vf_lr: float = 2.5e-4
+    minibatch_size: int = 32
+    max_opt_epochs: int = 10
+    center_adv: bool = False
+    positive_adv: bool = False
+    policy_ent_coeff: float = 0.02
+    use_softplus_entropy: bool = False
+    stop_entropy_gradient: bool = False
+    entropy_method: str = "regularized"
+    share_network: bool = False
+    architecture: str = "Encoder"
+    policy_head_input: str = "latest_memory"
+    dropatt: float = 0.0
+    attn_type: int = 1
+    pre_lnorm: bool = False
+    init_params: bool = False
+    gating: str = "residual"
+    init_std: float = 1.0
+    learn_std: bool = False
+    policy_head_type: str = "Default"
+    policy_lr_schedule: str = "no_schedule"
+    vf_lr_schedule: str = "no_schedule"
+    decay_epoch_init: int = 500
+    decay_epoch_end: int = 1000
+    min_lr_factor: float = 0.1
+    tfixup: bool = False
+    remove_ln: bool = False
+    recurrent_policy: bool = False
+    pretrained_dir: Optional[str] = None
+    pretrained_epoch: int = 4980
+    output_weights_scale: float = 1.0
+    normalized_wm: bool = False
+    annealing_std: bool = False
+    min_std: float = 1e-6
+    gpu_id: int = 0
 
 
 from hydra.core.config_store import ConfigStore
@@ -617,11 +617,11 @@ cs.store(name="train_config", node=TrainConfig)
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
     print(f"cfg {cfg}")
-    cfg_dict = OmegaConf.to_container(cfg)
+    # cfg_dict = OmegaConf.to_container(cfg)
     # cfg_dict.pop("_target_")
-    breakpoint()
-    return transformer_ppo_halfcheetah(env_name=cfg.env_name, seed=cfg.seed)
-    # return hydra.utils.instantiate(cfg)
+    # breakpoint()
+    # return transformer_ppo_halfcheetah(env_name=cfg.env_name, seed=cfg.seed)
+    return hydra.utils.call(cfg)
     # return transformer_ppo_halfcheetah(
     #     env_name=cfg.env_name,
     #     seed=cfg.seed,
@@ -680,5 +680,5 @@ def hydra_wrapper(cfg: TrainConfig):
 
 
 if __name__ == "__main__":
-    # hydra_wrapper()
-    transformer_ppo_halfcheetah()
+    hydra_wrapper()
+    # transformer_ppo_halfcheetah()

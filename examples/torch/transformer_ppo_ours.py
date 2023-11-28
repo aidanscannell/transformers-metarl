@@ -322,6 +322,7 @@ def transformer_ppo_halfcheetah(
 
     """
     print(f"wm_embedding_hidden_size {wm_embedding_hidden_size}")
+    breakpoint()
     set_seed(seed)
 
     policy = None

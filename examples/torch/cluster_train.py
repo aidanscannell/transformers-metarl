@@ -2,7 +2,7 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 import hydra
 
@@ -11,12 +11,12 @@ from garage import wrap_experiment
 
 @dataclass
 class TrainConfig:
+    wandb_run_name: str
     _target_: str = "__main__.main"
     use_wandb: bool = True
-    wandb_project_name = "adaptive-context-rl"
-    wandb_group = "TrMRL"
-    wandb_tags = ["TrMRL"]
-    # run_name:
+    wandb_project_name: str = "adaptive-context-rl"
+    wandb_group: str = "TrMRL"
+    wandb_tags: List[str] = ["TrMRL"]
 
     env_name: str = "HalfCheetah"
     seed: int = 1
@@ -483,7 +483,7 @@ def hydra_wrapper(cfg: TrainConfig):
             group=cfg.wandb_group,
             tags=cfg.wandb_tags,
             config=cfg_dict,
-            name=cfg.run_name,
+            name=cfg.wandb_run_name,
             # monitor_gym=cfg.monitor_gym,
             save_code=True,
             dir=get_original_cwd(),  # don't nest wandb inside hydra dir

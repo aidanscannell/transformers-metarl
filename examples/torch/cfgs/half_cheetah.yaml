@@ -41,13 +41,12 @@ min_lr_factor: 0.0001
 policy_head_type: "Default"
 
 
-wandb:
-  group: "TrMRL"
-  project: "adaptive-context-rl"
-  use_wandb: True
-  run_name: seed=${random_seed}-${now:%Y-%m-%d_%H-%M-%S}
-  tags:
-    - "TrMRL"
+wandb_group: "TrMRL"
+wandb_project_name: "adaptive-context-rl"
+use_wandb: True
+wandb_run_name: seed=${random_seed}-${now:%Y-%m-%d_%H-%M-%S}
+wandb_tags:
+  - "TrMRL"
 
 hydra:
   run:

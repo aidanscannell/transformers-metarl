@@ -46,7 +46,7 @@ main_config:
 wandb_group: "TrMRL"
 wandb_project_name: "adaptive-context-rl"
 use_wandb: True
-wandb_run_name: seed=${seed}-${now:%Y-%m-%d_%H-%M-%S}
+wandb_run_name: seed=${main_config.seed}-${now:%Y-%m-%d_%H-%M-%S}
 wandb_tags:
   - "TrMRL"
 

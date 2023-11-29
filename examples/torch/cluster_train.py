@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 import hydra
@@ -16,7 +16,7 @@ class TrainConfig:
     use_wandb: bool = True
     wandb_project_name: str = "adaptive-context-rl"
     wandb_group: str = "TrMRL"
-    wandb_tags: List[str] = ["TrMRL"]
+    wandb_tags: List[str] = field(default_factory=lambda: ["TrMRL"])
 
     env_name: str = "HalfCheetah"
     seed: int = 1

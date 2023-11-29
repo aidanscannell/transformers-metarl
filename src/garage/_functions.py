@@ -74,7 +74,7 @@ def rollout(
     max_episode_length=np.inf,
     animated=False,
     pause_per_frame=None,
-    deterministic=False
+    deterministic=False,
 ):
     """Sample a single episode of the agent in the environment.
 
@@ -276,16 +276,17 @@ def log_performance(itr, batch, discount, prefix="Evaluation"):
 
         if wandb.run is not None:
             metrics = {
-                "Iteration": itr,
-                "NumEpisodes": len(returns),
-                "AverageDiscountedReturn": average_discounted_return,
-                "AverageReturn": np.mean(undiscounted_returns),
-                "StdReturn": np.std(undiscounted_returns),
-                "MaxReturn": np.max(undiscounted_returns),
-                "MinReturn": np.min(undiscounted_returns),
-                "TerminationRate": np.mean(termination),
+                f"{prefix}/Iteration": itr,
+                f"{prefix}/NumEpisodes": len(returns),
+                f"{prefix}/AverageDiscountedReturn": average_discounted_return,
+                f"{prefix}/AverageReturn": np.mean(undiscounted_returns),
+                f"{prefix}/StdReturn": np.std(undiscounted_returns),
+                f"{prefix}/MaxReturn": np.max(undiscounted_returns),
+                f"{prefix}/MinReturn": np.min(undiscounted_returns),
+                f"{prefix}/TerminationRate": np.mean(termination),
             }
-            wandb.log({prefix: metrics})
+            wandb.log(metrics)
+            # wandb.log({prefix: metrics})
 
     # TODO: Remove this check after hyper searchs
     # if np.mean(undiscounted_returns) < -200.0 and prefix == "Average":

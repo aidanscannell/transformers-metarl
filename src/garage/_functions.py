@@ -5,6 +5,7 @@ import time
 import click
 from dowel import tabular
 import numpy as np
+import wandb
 
 from garage import EpisodeBatch, StepType
 from garage.np import discount_cumsum, stack_tensor_dict_list
@@ -48,30 +49,33 @@ def make_optimizer(optimizer_type, module=None, **kwargs):
         opt_type, opt_args = optimizer_type
         for name, arg in kwargs.items():
             if not isinstance(arg, _Default):
-                raise ValueError('Should not specify {} and explicit \
-                    optimizer args at the same time'.format(name))
+                raise ValueError(
+                    "Should not specify {} and explicit \
+                    optimizer args at the same time".format(
+                        name
+                    )
+                )
         if module is not None:
             return opt_type(module.parameters(), **opt_args)
         else:
             return opt_type(**opt_args)
 
-    opt_args = {
-        k: v.val if isinstance(v, _Default) else v
-        for k, v in kwargs.items()
-    }
+    opt_args = {k: v.val if isinstance(v, _Default) else v for k, v in kwargs.items()}
     if module is not None:
         return optimizer_type(module.parameters(), **opt_args)
     else:
         return optimizer_type(**opt_args)
 
 
-def rollout(env,
-            agent,
-            *,
-            max_episode_length=np.inf,
-            animated=False,
-            pause_per_frame=None,
-            deterministic=False):
+def rollout(
+    env,
+    agent,
+    *,
+    max_episode_length=np.inf,
+    animated=False,
+    pause_per_frame=None,
+    deterministic=False
+):
     """Sample a single episode of the agent in the environment.
 
     Args:
@@ -118,8 +122,8 @@ def rollout(env,
         if pause_per_frame is not None:
             time.sleep(pause_per_frame)
         a, agent_info = agent.get_action(last_obs)
-        if deterministic and 'mean' in agent_info:
-            a = agent_info['mean']
+        if deterministic and "mean" in agent_info:
+            a = agent_info["mean"]
         es = env.step(a)
         env_steps.append(es)
         observations.append(last_obs)
@@ -140,11 +144,9 @@ def rollout(env,
     )
 
 
-def obtain_evaluation_episodes(policy,
-                               env,
-                               max_episode_length=1000,
-                               num_eps=100,
-                               deterministic=True):
+def obtain_evaluation_episodes(
+    policy, env, max_episode_length=1000, num_eps=100, deterministic=True
+):
     """Sample the policy for num_eps episodes and return average values.
 
     Args:
@@ -164,12 +166,14 @@ def obtain_evaluation_episodes(policy,
     episodes = []
     # Use a finite length rollout for evaluation.
 
-    with click.progressbar(range(num_eps), label='Evaluating') as pbar:
+    with click.progressbar(range(num_eps), label="Evaluating") as pbar:
         for _ in pbar:
-            eps = rollout(env,
-                          policy,
-                          max_episode_length=max_episode_length,
-                          deterministic=deterministic)
+            eps = rollout(
+                env,
+                policy,
+                max_episode_length=max_episode_length,
+                deterministic=deterministic,
+            )
             episodes.append(eps)
     return EpisodeBatch.from_list(env.spec, episodes)
 
@@ -196,13 +200,13 @@ def log_multitask_performance(itr, batch, discount, name_map=None):
     """
     eps_by_name = defaultdict(list)
     for eps in batch.split():
-        task_name = '__unnamed_task__'
-        if 'task_name' in eps.env_infos:
-            task_name = eps.env_infos['task_name'][0]
-        elif 'task_id' in eps.env_infos:
+        task_name = "__unnamed_task__"
+        if "task_name" in eps.env_infos:
+            task_name = eps.env_infos["task_name"][0]
+        elif "task_id" in eps.env_infos:
             name_map = {} if name_map is None else name_map
-            task_id = eps.env_infos['task_id'][0]
-            task_name = name_map.get(task_id, 'Task #{}'.format(task_id))
+            task_id = eps.env_infos["task_id"][0]
+            task_name = name_map.get(task_id, "Task #{}".format(task_id))
         eps_by_name[task_name].append(eps)
     if name_map is None:
         task_names = eps_by_name.keys()
@@ -211,26 +215,25 @@ def log_multitask_performance(itr, batch, discount, name_map=None):
     for task_name in task_names:
         if task_name in eps_by_name:
             episodes = eps_by_name[task_name]
-            log_performance(itr,
-                            EpisodeBatch.concatenate(*episodes),
-                            discount,
-                            prefix=task_name)
+            log_performance(
+                itr, EpisodeBatch.concatenate(*episodes), discount, prefix=task_name
+            )
         else:
-            with tabular.prefix(task_name + '/'):
-                tabular.record('Iteration', itr)
-                tabular.record('NumEpisodes', 0)
-                tabular.record('AverageDiscountedReturn', np.nan)
-                tabular.record('AverageReturn', np.nan)
-                tabular.record('StdReturn', np.nan)
-                tabular.record('MaxReturn', np.nan)
-                tabular.record('MinReturn', np.nan)
-                tabular.record('TerminationRate', np.nan)
-                tabular.record('SuccessRate', np.nan)
+            with tabular.prefix(task_name + "/"):
+                tabular.record("Iteration", itr)
+                tabular.record("NumEpisodes", 0)
+                tabular.record("AverageDiscountedReturn", np.nan)
+                tabular.record("AverageReturn", np.nan)
+                tabular.record("StdReturn", np.nan)
+                tabular.record("MaxReturn", np.nan)
+                tabular.record("MinReturn", np.nan)
+                tabular.record("TerminationRate", np.nan)
+                tabular.record("SuccessRate", np.nan)
 
-    return log_performance(itr, batch, discount=discount, prefix='Average')
+    return log_performance(itr, batch, discount=discount, prefix="Average")
 
 
-def log_performance(itr, batch, discount, prefix='Evaluation'):
+def log_performance(itr, batch, discount, prefix="Evaluation"):
     """Evaluate the performance of an algorithm on a batch of episodes.
 
     Args:
@@ -251,36 +254,47 @@ def log_performance(itr, batch, discount, prefix='Evaluation'):
         returns.append(discount_cumsum(eps.rewards, discount))
         undiscounted_returns.append(sum(eps.rewards))
         termination.append(
-            float(
-                any(step_type == StepType.TERMINAL
-                    for step_type in eps.step_types)))
-        if 'success' in eps.env_infos:
-            success.append(float(eps.env_infos['success'].any()))
+            float(any(step_type == StepType.TERMINAL for step_type in eps.step_types))
+        )
+        if "success" in eps.env_infos:
+            success.append(float(eps.env_infos["success"].any()))
 
     average_discounted_return = np.mean([rtn[0] for rtn in returns])
 
-    with tabular.prefix(prefix + '/'):
-        tabular.record('Iteration', itr)
-        tabular.record('NumEpisodes', len(returns))
+    with tabular.prefix(prefix + "/"):
+        tabular.record("Iteration", itr)
+        tabular.record("NumEpisodes", len(returns))
 
-        tabular.record('AverageDiscountedReturn', average_discounted_return)
-        tabular.record('AverageReturn', np.mean(undiscounted_returns))
-        tabular.record('StdReturn', np.std(undiscounted_returns))
-        tabular.record('MaxReturn', np.max(undiscounted_returns))
-        tabular.record('MinReturn', np.min(undiscounted_returns))
-        tabular.record('TerminationRate', np.mean(termination))
+        tabular.record("AverageDiscountedReturn", average_discounted_return)
+        tabular.record("AverageReturn", np.mean(undiscounted_returns))
+        tabular.record("StdReturn", np.std(undiscounted_returns))
+        tabular.record("MaxReturn", np.max(undiscounted_returns))
+        tabular.record("MinReturn", np.min(undiscounted_returns))
+        tabular.record("TerminationRate", np.mean(termination))
         if success:
-            tabular.record('SuccessRate', np.mean(success))
+            tabular.record("SuccessRate", np.mean(success))
 
-    #TODO: Remove this check after hyper searchs
+        if wandb.run is not None:
+            metrics = {
+                "Iteration": itr,
+                "NumEpisodes": len(returns),
+                "AverageDiscountedReturn": average_discounted_return,
+                "AverageReturn": np.mean(undiscounted_returns),
+                "StdReturn": np.std(undiscounted_returns),
+                "MaxReturn": np.max(undiscounted_returns),
+                "MinReturn": np.min(undiscounted_returns),
+                "TerminationRate": np.mean(termination),
+            }
+            wandb.log({prefix: metrics})
+
+    # TODO: Remove this check after hyper searchs
     # if np.mean(undiscounted_returns) < -200.0 and prefix == "Average":
     #     raise Exception("Poor performance for halfcheetah.")
-    # elif itr >= 100 and np.mean(undiscounted_returns) < 0.0 and prefix == "Average": 
+    # elif itr >= 100 and np.mean(undiscounted_returns) < 0.0 and prefix == "Average":
     #     raise Exception("Poor performance for halfcheetah.")
-    # elif itr >= 200 and np.mean(undiscounted_returns) < 250.0 and prefix == "Average": 
+    # elif itr >= 200 and np.mean(undiscounted_returns) < 250.0 and prefix == "Average":
     #     raise Exception("Poor performance for halfcheetah.")
-    # elif itr >= 300 and np.mean(undiscounted_returns) < 400.0 and prefix == "Average": 
+    # elif itr >= 300 and np.mean(undiscounted_returns) < 400.0 and prefix == "Average":
     #     raise Exception("Poor performance for halfcheetah.")
-
 
     return undiscounted_returns

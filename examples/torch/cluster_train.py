@@ -70,6 +70,7 @@ class MainConfig:
 @dataclass
 class TrainConfig:
     wandb_run_name: str
+    main_config: MainConfig
 
     defaults: List[Any] = field(
         default_factory=lambda: [{"main_config": "main_config"}]

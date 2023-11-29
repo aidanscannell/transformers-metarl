@@ -184,6 +184,20 @@ def transformer_ppo_halfcheetah(
         episode_per_task (int): Number of training episode per task.
 
     """
+    from hydra.utils import get_original_cwd
+    import wandb
+
+    run = wandb.init(
+        project="adaptive-context-rl",
+        group="HalfCheetahVelEnv",
+        tags=["TrMRL", "HalfCheetahVelEnv"],
+        # config=,
+        name="HalfCheetahVelEnv"
+        # monitor_gym=cfg.monitor_gym,
+        save_code=True,
+        dir=get_original_cwd(),  # don't nest wandb inside hydra dir
+    )
+
     set_seed(seed)
 
     policy = None

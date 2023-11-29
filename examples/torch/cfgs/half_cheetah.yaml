@@ -3,7 +3,7 @@ defaults:
   - override hydra/launcher: slurm
   - _self_
 
-_target_: "__main__.transformer_ppo_halfcheetah"
+_target_: "__main__.main"
 env_name: "HalfCheetahV2"
 wm_embedding_hidden_size: 32
 n_heads: 16
@@ -39,6 +39,15 @@ decay_epoch_init: 100
 decay_epoch_end: 3700
 min_lr_factor: 0.0001
 policy_head_type: "Default"
+
+
+wandb:
+  group: "TrMRL"
+  project: "adaptive-context-rl"
+  use_wandb: True
+  run_name: seed=${random_seed}-${now:%Y-%m-%d_%H-%M-%S}
+  tags:
+    - "TrMRL"
 
 hydra:
   run:

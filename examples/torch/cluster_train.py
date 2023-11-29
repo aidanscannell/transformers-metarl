@@ -4,13 +4,20 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from garage import wrap_experiment
 import hydra
+
+from garage import wrap_experiment
 
 
 @dataclass
 class TrainConfig:
     _target_: str = "__main__.main"
+    use_wandb: bool = True
+    wandb_project_name = "adaptive-context-rl"
+    wandb_group = "TrMRL"
+    wandb_tags = ["TrMRL"]
+    # run_name:
+
     env_name: str = "HalfCheetah"
     seed: int = 1
     max_episode_length: int = 200
@@ -451,7 +458,31 @@ def main(
 
 @hydra.main(version_base="1.3", config_path="./cfgs", config_name="half_cheetah")
 def hydra_wrapper(cfg: TrainConfig):
-    print(f"cfg {cfg}")
+    import pprint
+
+    from hydra.utils import get_original_cwd
+    import omegaconf
+    import wandb
+
+    cfg_dict = omegaconf.OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
+    pprint.pprint(cfg_dict)
+
+    if cfg.use_wandb:  # Initialise WandB
+        import wandb
+
+        run = wandb.init(
+            project=cfg.wandb_project_name,
+            group=cfg.wandb_group,
+            tags=cfg.wandb_tags,
+            config=cfg_dict,
+            name=cfg.run_name,
+            # monitor_gym=cfg.monitor_gym,
+            save_code=True,
+            dir=get_original_cwd(),  # don't nest wandb inside hydra dir
+        )
+
     return hydra.utils.call(cfg)
 
 

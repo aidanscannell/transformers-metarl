@@ -2,7 +2,7 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
 
 import hydra
 
@@ -10,14 +10,8 @@ from garage import wrap_experiment
 
 
 @dataclass
-class TrainConfig:
-    wandb_run_name: str
+class MainConfig:
     _target_: str = "__main__.main"
-    use_wandb: bool = True
-    wandb_project_name: str = "adaptive-context-rl"
-    wandb_group: str = "TrMRL"
-    wandb_tags: List[str] = field(default_factory=lambda: ["TrMRL"])
-
     env_name: str = "HalfCheetah"
     seed: int = 1
     max_episode_length: int = 200
@@ -73,10 +67,28 @@ class TrainConfig:
     gpu_id: int = 0
 
 
+@dataclass
+class TrainConfig:
+    wandb_run_name: str
+
+    defaults: List[Any] = field(
+        default_factory=lambda: [
+            {"main_cfg": "main_cfg"},
+        ]
+    )
+
+    _target_: str = "__main__.main"
+    use_wandb: bool = True
+    wandb_project_name: str = "adaptive-context-rl"
+    wandb_group: str = "TrMRL"
+    wandb_tags: List[str] = field(default_factory=lambda: ["TrMRL"])
+
+
 from hydra.core.config_store import ConfigStore
 
 cs = ConfigStore.instance()
 cs.store(name="train_config", node=TrainConfig)
+cs.store(name="main_config", node=MainConfig)
 
 
 @wrap_experiment(snapshot_mode="gap", snapshot_gap=30)
@@ -450,7 +462,6 @@ def hydra_wrapper(cfg: TrainConfig):
 
     from hydra.utils import get_original_cwd
     import omegaconf
-    import wandb
 
     cfg_dict = omegaconf.OmegaConf.to_container(
         cfg, resolve=True, throw_on_missing=True
@@ -470,8 +481,7 @@ def hydra_wrapper(cfg: TrainConfig):
             save_code=True,
             dir=get_original_cwd(),  # don't nest wandb inside hydra dir
         )
-
-    return hydra.utils.call(cfg)
+    return hydra.utils.call(cfg.main_cfg)
 
 
 if __name__ == "__main__":

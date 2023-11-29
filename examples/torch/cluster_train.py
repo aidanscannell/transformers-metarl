@@ -2,7 +2,7 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
 
 import hydra
 
@@ -155,7 +155,6 @@ def main(
     from prettytable import PrettyTable
     import torch
 
-    from garage import EnvSpec, wrap_experiment
     from garage.envs import GymEnv
     from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
     from garage.experiment import OnlineMetaEvaluator  # MetaEvaluator,
@@ -188,10 +187,6 @@ def main(
             self.task_idxs = np.arange(self.num_tasks)
             self.task_idx = task_idx
             self._reset(ind=self.task_idx)
-
-            # self.spec = EnvSpec(
-            #     action_space=self.action_space, observation_space=self.observation_space
-            # )
 
         # ind is from 0 to 24
         def reset(self):
@@ -260,19 +255,6 @@ def main(
         def __init__(self, task=0):
             env = gym.make("walker2d-medium-v2")
             super().__init__(env=env, task_idx=task)
-
-    def count_parameters(model):
-        table = PrettyTable(["Modules", "Parameters"])
-        total_params = 0
-        for name, parameter in model.named_parameters():
-            if not parameter.requires_grad:
-                continue
-            param = parameter.numel()
-            table.add_row([name, param])
-            total_params += param
-        print(table)
-        print(f"Total Trainable Params: {total_params}")
-        return total_params
 
     set_seed(seed)
 

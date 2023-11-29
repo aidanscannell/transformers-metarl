@@ -87,8 +87,8 @@ class TrainConfig:
 from hydra.core.config_store import ConfigStore
 
 cs = ConfigStore.instance()
-cs.store(name="train_config", node=TrainConfig)
 cs.store(name="main_config", node=MainConfig)
+cs.store(name="train_config", node=TrainConfig)
 
 
 @wrap_experiment(snapshot_mode="gap", snapshot_gap=30)

@@ -477,7 +477,7 @@ def hydra_wrapper(cfg: TrainConfig):
             save_code=True,
             dir=get_original_cwd(),  # don't nest wandb inside hydra dir
         )
-    return hydra.utils.call(cfg.main_cfg)
+    return hydra.utils.call(cfg.main_config)
 
 
 if __name__ == "__main__":

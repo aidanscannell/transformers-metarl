@@ -3,7 +3,7 @@ defaults:
   - override hydra/launcher: slurm
   - _self_
 
-main_cfg:
+main_config:
   _target_: "__main__.main"
   env_name: "HalfCheetahV2"
   seed: 42

@@ -73,7 +73,7 @@ class TrainConfig:
     main_config: MainConfig
 
     defaults: List[Any] = field(
-        default_factory=lambda: [{"main_config": "main_config"}]
+        default_factory=lambda: [{"main_config": "half_cheetah_config"}]
     )
 
     _target_: str = "__main__.main"
@@ -86,7 +86,7 @@ class TrainConfig:
 from hydra.core.config_store import ConfigStore
 
 cs = ConfigStore.instance()
-cs.store(name="main_config", node=MainConfig)
+cs.store(group="main_cfg", name="half_cheetah_config", node=MainConfig)
 cs.store(name="train_config", node=TrainConfig)
 
 

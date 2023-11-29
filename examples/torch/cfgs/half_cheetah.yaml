@@ -43,12 +43,13 @@ main_config:
   policy_head_type: "Default"
 
 
-wandb_group: "TrMRL"
+wandb_group: ${main_config.env_name}
 wandb_project_name: "adaptive-context-rl"
 use_wandb: True
-wandb_run_name: seed=${main_config.seed}-${now:%Y-%m-%d_%H-%M-%S}
+wandb_run_name: TrMRL-seed=${main_config.seed}-${now:%Y-%m-%d_%H-%M-%S}
 wandb_tags:
   - "TrMRL"
+  - ${main_config.env_name}
 
 hydra:
   run:

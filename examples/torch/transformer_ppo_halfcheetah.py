@@ -2,35 +2,31 @@
 """Example script to run RL2 in HalfCheetah."""
 # pylint: disable=no-value-for-parameter
 import click
+from prettytable import PrettyTable
 import torch
-from garage.torch import set_gpu_mode
 
-from garage import wrap_experiment
 from garage.envs import GymEnv
-
 from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
 
 # from garage.envs.metaworld import ML1Env
 from garage.experiment import (
-    task_sampler,
-    # MetaEvaluator,
-    OnlineMetaEvaluator,
+    OnlineMetaEvaluator,  # MetaEvaluator,
     Snapshotter,
+    task_sampler,
 )
 from garage.experiment.deterministic import set_seed
 from garage.sampler import LocalSampler
-from garage.trainer import Trainer
 from garage.torch.algos import RL2PPO
 from garage.torch.algos.rl2 import RL2Env, RL2Worker
-from garage.torch.policies import (
-    GaussianTransformerPolicy,
-    GaussianTransformerEncoderPolicy,
+from garage.torch.policies import (  # GaussianMLPPolicy,
     GaussianMemoryTransformerPolicy,
-    # GaussianMLPPolicy,
+    GaussianTransformerEncoderPolicy,
+    GaussianTransformerPolicy,
 )
+from garage.torch import set_gpu_mode
 from garage.torch.value_functions import GaussianMLPValueFunction
-
-from prettytable import PrettyTable
+from garage.trainer import Trainer
+from garage import wrap_experiment
 
 
 def count_parameters(model):
@@ -192,7 +188,7 @@ def transformer_ppo_halfcheetah(
         group="HalfCheetahVelEnv",
         tags=["TrMRL", "HalfCheetahVelEnv"],
         # config=,
-        name="HalfCheetahVelEnv"
+        name="HalfCheetahVelEnv",
         # monitor_gym=cfg.monitor_gym,
         save_code=True,
         dir=get_original_cwd(),  # don't nest wandb inside hydra dir

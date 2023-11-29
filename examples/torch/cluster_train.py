@@ -73,6 +73,12 @@ class TrainConfig:
     gpu_id: int = 0
 
 
+from hydra.core.config_store import ConfigStore
+
+cs = ConfigStore.instance()
+cs.store(name="train_config", node=TrainConfig)
+
+
 @wrap_experiment(snapshot_mode="gap", snapshot_gap=30)
 def main(
     ctxt,

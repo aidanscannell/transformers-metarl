@@ -71,7 +71,9 @@ class MainConfig:
 class TrainConfig:
     wandb_run_name: str
 
-    defaults: List[Any] = field(default_factory=lambda: [{"main_cfg": "main_config"}])
+    defaults: List[Any] = field(
+        default_factory=lambda: [{"main_config": "main_config"}]
+    )
 
     _target_: str = "__main__.main"
     use_wandb: bool = True

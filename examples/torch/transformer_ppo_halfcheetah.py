@@ -180,7 +180,6 @@ def transformer_ppo_halfcheetah(
         episode_per_task (int): Number of training episode per task.
 
     """
-    from hydra.utils import get_original_cwd
     import wandb
 
     run = wandb.init(
@@ -191,7 +190,7 @@ def transformer_ppo_halfcheetah(
         name=f"TrMRL-seed-{seed}",
         # monitor_gym=cfg.monitor_gym,
         save_code=True,
-        dir=get_original_cwd(),  # don't nest wandb inside hydra dir
+        # dir=get_original_cwd(),  # don't nest wandb inside hydra dir
     )
 
     set_seed(seed)

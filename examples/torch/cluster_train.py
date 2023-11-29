@@ -86,7 +86,7 @@ class TrainConfig:
 from hydra.core.config_store import ConfigStore
 
 cs = ConfigStore.instance()
-cs.store(group="main_cfg", name="half_cheetah_config", node=MainConfig)
+cs.store(group="main_config", name="half_cheetah_config", node=MainConfig)
 cs.store(name="train_config", node=TrainConfig)
 
 

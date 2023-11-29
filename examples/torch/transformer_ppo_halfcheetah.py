@@ -188,7 +188,7 @@ def transformer_ppo_halfcheetah(
         group="HalfCheetahVelEnv",
         tags=["TrMRL", "HalfCheetahVelEnv"],
         # config=,
-        name="HalfCheetahVelEnv",
+        name=f"TrMRL-seed-{seed}",
         # monitor_gym=cfg.monitor_gym,
         save_code=True,
         dir=get_original_cwd(),  # don't nest wandb inside hydra dir

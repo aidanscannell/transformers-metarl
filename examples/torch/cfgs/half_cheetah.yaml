@@ -5,6 +5,7 @@ defaults:
 
 _target_: "__main__.main"
 env_name: "HalfCheetahV2"
+seed: 42
 wm_embedding_hidden_size: 32
 n_heads: 16
 d_model: 128
@@ -44,7 +45,7 @@ policy_head_type: "Default"
 wandb_group: "TrMRL"
 wandb_project_name: "adaptive-context-rl"
 use_wandb: True
-wandb_run_name: seed=${random_seed}-${now:%Y-%m-%d_%H-%M-%S}
+wandb_run_name: seed=${seed}-${now:%Y-%m-%d_%H-%M-%S}
 wandb_tags:
   - "TrMRL"
 

@@ -254,7 +254,6 @@ class OnlineMetaEvaluator:
 
         self._eval_itr += 1
         logger.log("Finished meta-testing...")
-        breakpoint()
 
     def _cluster_by_episode_number(self, episodes):
         episode_idx = collections.defaultdict(list)

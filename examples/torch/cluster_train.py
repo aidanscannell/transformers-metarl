@@ -13,7 +13,7 @@ from garage import wrap_experiment
 class MainConfig:
     # _target_: str = "__main__.main"
     _target_: str = "cluster_train.main"
-    env_name: str = "HalfCheetah"
+    env_name: str = "HalfCheetah"  # HopperV2/HalfCheetahV2/Walker2DV2/HalfCheetahVelEnv
     seed: int = 1
     max_episode_length: int = 200
     meta_batch_size: int = 20
@@ -185,7 +185,6 @@ def main(
     from garage.trainer import Trainer
 
     class MassDampingENV(gym.Env):
-        # class HopperMediumV2(gym.Env):
         def __init__(self, env, task_idx: int = 0):
             self._env = env
             self.action_space = env.action_space
@@ -288,7 +287,8 @@ def main(
     elif env_name in "HalfCheetahVelEnv":
         env_class = HalfCheetahVelEnv
     else:
-        raise NotImplementedError("Only HopperV2/HalfCheetahV2/Walker2DV2 accpeted")
+        raise NotImplementedError("Only HopperV2/HalfCheetahV2/Walker2DV2 accepted")
+    print(f"Using env {env_class}")
 
     tasks = task_sampler.SetTaskSampler(
         env_class,

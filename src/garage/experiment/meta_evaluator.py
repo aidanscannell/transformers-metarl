@@ -5,6 +5,7 @@ import collections
 from dowel import logger, tabular
 import numpy as np
 import torch
+import wandb
 
 from garage import AugmentedEpisodeBatch, EpisodeBatch, log_multitask_performance
 from garage.experiment.deterministic import get_seed
@@ -222,6 +223,11 @@ class OnlineMetaEvaluator:
         else:
             name_map = None
 
+        if wandb.run is not None:
+            wandb.log({"max_episode_length": self._max_episode_length})
+            wandb.log({"n_test_tasks": self._n_test_tasks})
+            wandb.log({"n_test_episodes": self._n_test_episodes})
+
         eps = self._test_sampler.obtain_samples(
             self._eval_itr,
             self._max_episode_length
@@ -248,6 +254,7 @@ class OnlineMetaEvaluator:
 
         self._eval_itr += 1
         logger.log("Finished meta-testing...")
+        breakpoint()
 
     def _cluster_by_episode_number(self, episodes):
         episode_idx = collections.defaultdict(list)

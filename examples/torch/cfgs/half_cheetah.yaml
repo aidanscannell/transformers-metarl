@@ -4,7 +4,8 @@ defaults:
   - _self_
 
 main_config:
-  _target_: "__main__.main"
+  _target_: "cluster_train.main"
+  # _target_: "__main__.main"
   env_name: "HalfCheetahV2"
   seed: 42
   wm_embedding_hidden_size: 32

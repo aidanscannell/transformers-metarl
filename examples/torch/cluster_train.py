@@ -11,7 +11,8 @@ from garage import wrap_experiment
 
 @dataclass
 class MainConfig:
-    _target_: str = "__main__.main"
+    # _target_: str = "__main__.main"
+    _target_: str = "cluster_train.main"
     env_name: str = "HalfCheetah"
     seed: int = 1
     max_episode_length: int = 200
@@ -480,6 +481,7 @@ def hydra_wrapper(cfg: TrainConfig):
             save_code=True,
             dir=get_original_cwd(),  # don't nest wandb inside hydra dir
         )
+
     return hydra.utils.call(cfg.main_config)
 
 

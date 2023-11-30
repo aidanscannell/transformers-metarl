@@ -389,7 +389,7 @@ def main(
 
     meta_evaluator = OnlineMetaEvaluator(
         test_task_sampler=tasks,
-        n_test_tasks=24,
+        n_test_tasks=1,
         n_test_episodes=1,
         prefix="MetaTestAdapt",
         worker_class=RL2Worker,

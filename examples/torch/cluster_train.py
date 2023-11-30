@@ -15,7 +15,8 @@ class MainConfig:
     _target_: str = "cluster_train.main"
     env_name: str = "HalfCheetah"  # HopperV2/HalfCheetahV2/Walker2DV2/HalfCheetahVelEnv
     seed: int = 1
-    max_episode_length: int = 200
+    max_episode_length: int = 1000
+    # max_episode_length: int = 200
     meta_batch_size: int = 20
     n_epochs: int = 5000
     episode_per_task: int = 2

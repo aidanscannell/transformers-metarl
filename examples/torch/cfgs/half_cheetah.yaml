@@ -16,7 +16,8 @@ main_config:
   em_size: 5
   dim_ff: 512
   meta_batch_size: 20
-  episode_per_task: 2
+  # episode_per_task: 2
+  episode_per_task: 1
   discount: 0.9
   gae_lambda: 0.8
   lr_clip_range: 0.2

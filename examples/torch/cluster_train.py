@@ -19,7 +19,7 @@ class MainConfig:
     # max_episode_length: int = 200
     meta_batch_size: int = 20
     n_epochs: int = 5000
-    episode_per_task: int = 2
+    episode_per_task: int = 1
     wm_embedding_hidden_size: int = 32
     n_heads: int = 1
     d_model: int = 4

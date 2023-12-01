@@ -201,12 +201,13 @@ def main(
             self._reset(ind=self.task_idx)
 
         # ind is from 0 to 24
-        def reset(self):
-            ind = np.random.choice(self.task_idxs, 1)
-            # print(f"ind {ind}")
-            return self._reset(ind=ind)
+        def reset(self, sample_task: bool = False):
+            if sample_task:
+                self.task_idx = np.random.choice(self.task_idxs, 1)
 
-        def _reset(self, ind):
+            return self._reset(ind=self.task_idx)
+
+        def _reset(self, ind: int):
             if isinstance(ind, np.ndarray):
                 ind = ind.item()
             model = self._env.env.wrapped_env.model
@@ -251,6 +252,7 @@ def main(
                     key, "direction", mapping to -1 or 1).
 
             """
+            self.task_idx = task
             self._reset(ind=task)
 
     class HopperV2(MassDampingENV):

@@ -12,47 +12,48 @@ from garage.torch import set_gpu_mode
 from garage.torch.algos import PEARL
 from garage.torch.algos.pearl import PEARLWorker
 from garage.torch.embeddings import MLPEncoder
-from garage.torch.policies import (ContextConditionedPolicy,
-                                   TanhGaussianMLPPolicy)
+from garage.torch.policies import ContextConditionedPolicy, TanhGaussianMLPPolicy
 from garage.torch.q_functions import ContinuousMLPQFunction
 from garage.trainer import Trainer
 
 
 @click.command()
-@click.option('--num_epochs', default=500)
-@click.option('--num_train_tasks', default=100)
-@click.option('--num_test_tasks', default=100)
-@click.option('--encoder_hidden_size', default=200)
-@click.option('--net_size', default=300)
-@click.option('--num_steps_per_epoch', default=2000)
-@click.option('--num_initial_steps', default=2000)
-@click.option('--num_steps_prior', default=400)
-@click.option('--num_extra_rl_steps_posterior', default=600)
-@click.option('--batch_size', default=256)
-@click.option('--embedding_batch_size', default=100)
-@click.option('--embedding_mini_batch_size', default=100)
-@click.option('--max_episode_length', default=200)
+@click.option("--num_epochs", default=500)
+@click.option("--num_train_tasks", default=100)
+@click.option("--num_test_tasks", default=100)
+@click.option("--encoder_hidden_size", default=200)
+@click.option("--net_size", default=300)
+@click.option("--num_steps_per_epoch", default=2000)
+@click.option("--num_initial_steps", default=2000)
+@click.option("--num_steps_prior", default=400)
+@click.option("--num_extra_rl_steps_posterior", default=600)
+@click.option("--batch_size", default=256)
+@click.option("--embedding_batch_size", default=100)
+@click.option("--embedding_mini_batch_size", default=100)
+@click.option("--max_episode_length", default=200)
 @wrap_experiment
-def pearl_half_cheetah_vel(ctxt=None,
-                           seed=1,
-                           num_epochs=500,
-                           num_train_tasks=100,
-                           num_test_tasks=100,
-                           latent_size=5,
-                           encoder_hidden_size=200,
-                           net_size=300,
-                           meta_batch_size=16,
-                           num_steps_per_epoch=2000,
-                           num_initial_steps=2000,
-                           num_tasks_sample=5,
-                           num_steps_prior=400,
-                           num_extra_rl_steps_posterior=600,
-                           batch_size=256,
-                           embedding_batch_size=100,
-                           embedding_mini_batch_size=100,
-                           max_episode_length=200,
-                           reward_scale=5.,
-                           use_gpu=False):
+def pearl_half_cheetah_vel(
+    ctxt=None,
+    seed=1,
+    num_epochs=500,
+    num_train_tasks=100,
+    num_test_tasks=100,
+    latent_size=5,
+    encoder_hidden_size=200,
+    net_size=300,
+    meta_batch_size=16,
+    num_steps_per_epoch=2000,
+    num_initial_steps=2000,
+    num_tasks_sample=5,
+    num_steps_prior=400,
+    num_extra_rl_steps_posterior=600,
+    batch_size=256,
+    embedding_batch_size=100,
+    embedding_mini_batch_size=100,
+    max_episode_length=200,
+    reward_scale=5.0,
+    use_gpu=True,
+):
     """Train PEARL with HalfCheetahVel environment.
 
     Args:
@@ -90,32 +91,42 @@ def pearl_half_cheetah_vel(ctxt=None,
 
     """
     set_seed(seed)
-    encoder_hidden_sizes = (encoder_hidden_size, encoder_hidden_size,
-                            encoder_hidden_size)
+    encoder_hidden_sizes = (
+        encoder_hidden_size,
+        encoder_hidden_size,
+        encoder_hidden_size,
+    )
     # create multi-task environment and sample tasks
     env_sampler = SetTaskSampler(
         HalfCheetahVelEnv,
         wrapper=lambda env, _: normalize(
-            GymEnv(env, max_episode_length=max_episode_length)))
+            GymEnv(env, max_episode_length=max_episode_length)
+        ),
+    )
     env = env_sampler.sample(num_train_tasks)
     test_env_sampler = SetTaskSampler(
         HalfCheetahVelEnv,
         wrapper=lambda env, _: normalize(
-            GymEnv(env, max_episode_length=max_episode_length)))
+            GymEnv(env, max_episode_length=max_episode_length)
+        ),
+    )
 
     trainer = Trainer(ctxt)
 
     # instantiate networks
     augmented_env = PEARL.augment_env_spec(env[0](), latent_size)
-    qf = ContinuousMLPQFunction(env_spec=augmented_env,
-                                hidden_sizes=[net_size, net_size, net_size])
+    qf = ContinuousMLPQFunction(
+        env_spec=augmented_env, hidden_sizes=[net_size, net_size, net_size]
+    )
 
-    vf_env = PEARL.get_env_spec(env[0](), latent_size, 'vf')
-    vf = ContinuousMLPQFunction(env_spec=vf_env,
-                                hidden_sizes=[net_size, net_size, net_size])
+    vf_env = PEARL.get_env_spec(env[0](), latent_size, "vf")
+    vf = ContinuousMLPQFunction(
+        env_spec=vf_env, hidden_sizes=[net_size, net_size, net_size]
+    )
 
     inner_policy = TanhGaussianMLPPolicy(
-        env_spec=augmented_env, hidden_sizes=[net_size, net_size, net_size])
+        env_spec=augmented_env, hidden_sizes=[net_size, net_size, net_size]
+    )
 
     pearl = PEARL(
         env=env,
@@ -145,12 +156,14 @@ def pearl_half_cheetah_vel(ctxt=None,
     if use_gpu:
         pearl.to()
 
-    trainer.setup(algo=pearl,
-                  env=env[0](),
-                  sampler_cls=LocalSampler,
-                  sampler_args=dict(max_episode_length=max_episode_length),
-                  n_workers=1,
-                  worker_class=PEARLWorker)
+    trainer.setup(
+        algo=pearl,
+        env=env[0](),
+        sampler_cls=LocalSampler,
+        sampler_args=dict(max_episode_length=max_episode_length),
+        n_workers=1,
+        worker_class=PEARLWorker,
+    )
 
     trainer.train(n_epochs=num_epochs, batch_size=batch_size)
 

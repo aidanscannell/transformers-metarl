@@ -323,7 +323,7 @@ class AdaptiveMDPEvaluator:
                 breakpoint()
                 if len(ep_actions) < self.seq_len or not self.res_agent:
                     # algo.get_exploration_policy()
-                    action, agent_info = algo.get_action(
+                    action, agent_info = algo.policy.get_action(
                         obs_tensor, deterministic=self.deterministic
                     )
                     if self.deterministic and "mean" in agent_info:

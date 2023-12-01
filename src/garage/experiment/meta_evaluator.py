@@ -266,106 +266,86 @@ class OnlineMetaEvaluator:
         return episode_idx
 
 
-# class AdaptiveEvaluator:
-#     def __init__(
-#         self,
-#         *,
-#         eval_env,
-#         n_eval: int = 20,
-#         # # test_task_sampler,
-#         # n_test_tasks=30,
-#         # n_test_episodes=5,
-#         # prefix="MetaTest",
-#         # test_task_names=None,
-#         # worker_class=DefaultWorker,
-#         # worker_args=None
-#     ):
-#         self.eval_env = eval_env
-#         self.num_eval = n_eval
-#         # self._test_task_sampler = test_task_sampler
-#         # self._worker_class = worker_class
-#         # if worker_args is None:
-#         #     self._worker_args = {}
-#         # else:
-#         #     self._worker_args = worker_args
-#         # if n_test_tasks is None:
-#         #     n_test_tasks = test_task_sampler.n_tasks
-#         # self._n_test_tasks = n_test_tasks
-#         # self._n_test_episodes = n_test_episodes
-#         # self._eval_itr = 0
-#         # self._prefix = prefix
-#         # self._test_task_names = test_task_names
-#         # self._episodes_per_trial = (
-#         #     worker_args["n_episodes_per_trial"]
-#         #     if "n_episodes_per_trial" in worker_args
-#         #     else 1
-#         # )
-#         # self._test_sampler = None
-#         # self._max_episode_length = None
+class AdaptiveMDPEvaluator:
+    def __init__(
+        self,
+        eval_env,
+        n_eval_episodes: int = 20,
+        seq_len: int = 10,
+        device: str = "cuda",
+    ):
+        self.eval_env = eval_env
+        self.num_eval_episodes = n_eval_episodes
+        self.seq_len = seq_len
+        self.device = device
+        self.res_agent = True
+        self.deterministic = True
+        # self._test_task_sampler = test_task_sampler
+        # self._worker_class = worker_class
+        # if worker_args is None:
+        #     self._worker_args = {}
+        # else:
+        #     self._worker_args = worker_args
+        # if n_test_tasks is None:
+        #     n_test_tasks = test_task_sampler.n_tasks
+        # self._n_test_tasks = n_test_tasks
+        # self._n_test_episodes = n_test_episodes
+        # self._eval_itr = 0
+        # self._prefix = prefix
+        # self._test_task_names = test_task_names
+        # self._episodes_per_trial = (
+        #     worker_args["n_episodes_per_trial"]
+        #     if "n_episodes_per_trial" in worker_args
+        #     else 1
+        # )
+        # self._test_sampler = None
+        # self._max_episode_length = None
 
-#     @torch.no_grad()
-#     # def evaluate(self, res_agent:bool=True, deterministic:bool=True, num_eval:int=20):
-#     def evaluate(self, algo, test_episodes_per_task=None):
-#         rewards = np.zeros(self.num_eval)
-#         for n in range(self.num_eval):
-#             obs, done = self.eval_env.reset(), False
-#             ep_reward = 0
-#             # used for saving episode to the buffer
-#             ep_states = [
-#                 obs,
-#             ]
-#             ep_actions = []
-#             while not done:
-#                 obs_tensor = torch.as_tensor(obs, dtype=torch.float32).to(self.device)
-#                 # action of offline RL agent
-#                 with torch.no_grad():
-#                     offline_act, _ = self.policy.actforward(
-#                         obs_tensor, True
-#                     )  # offline policy action
-#                 # first step, no context encoder to be used
-#                 if len(ep_actions) < self.seq_len or not res_agent:
-#                     action = offline_act.cpu().numpy()
-#                 else:
-#                     start_seq = (
-#                         -self.seq_len
-#                         if len(ep_states) < -self.seq_len
-#                         else -self.seq_len - 1
-#                     )  # same length for state sequence
-#                     context_states = np.array(ep_states[start_seq:-1], dtype=np.float32)
-#                     context_actions = np.array(
-#                         ep_actions[-self.seq_len :], dtype=np.float32
-#                     )
-#                     context_state = (
-#                         torch.from_numpy(context_states).unsqueeze(0).to(self.device)
-#                     )  # remove last state, add batch dimension
-#                     context_actions = (
-#                         torch.from_numpy(context_actions).unsqueeze(0).to(self.device)
-#                     )
-#                     time_step = (
-#                         torch.arange(context_actions.shape[1])
-#                         .unsqueeze(0)
-#                         .to(self.device)
-#                     )
-#                     with torch.no_grad():
-#                         encoded = self.encoder(
-#                             context_state, context_actions, time_step
-#                         ).squeeze(
-#                             0
-#                         )  # context encoder
-#                         res_state = self._res_state(
-#                             obs_tensor, offline_act, encoded
-#                         )  # augmented state
-#                         res_action = self.agent.select_action(
-#                             res_state, deterministic=deterministic
-#                         )
-#                         action = self._total_action(
-#                             offline_act.cpu().numpy(), res_action
-#                         )
-#                 obs, reward, done, info = self.eval_env.step(action)
-#                 ep_actions.append(action)
-#                 ep_states.append(obs)
-#                 ep_reward += reward
-#             rewards[n] = ep_reward
-#         ep_reward = self.eval_env.get_normalized_score(np.mean(rewards)) * 100
-#         std = self.eval_env.get_normalized_score(np.std(rewards)) * 100
-#         return ep_reward, std
+    @torch.no_grad()
+    # def evaluate(self, res_agent:bool=True, deterministic:bool=True, num_eval:int=20):
+    def evaluate(self, algo, test_episodes_per_task=None):
+        logger.log("Starting adaptive MDP evaluator...")
+        rewards = np.zeros(self.num_eval_episodes)
+        for n in range(self.num_eval_episodes):
+            obs, done = self.eval_env.reset(), False
+            ep_reward = 0
+            # used for saving episode to the buffer
+            ep_states = [obs]
+            ep_actions = []
+            while not done:
+                obs_tensor = torch.as_tensor(obs, dtype=torch.float32).to(self.device)
+                # action of offline RL agent
+                # with torch.no_grad():
+                #     offline_act, _ = algo.policy.actforward(
+                #         obs_tensor, True
+                #     )  # offline policy action
+                # first step, no context encoder to be used
+                breakpoint()
+                if len(ep_actions) < self.seq_len or not self.res_agent:
+                    # algo.get_exploration_policy()
+                    action, agent_info = algo.get_action(
+                        obs_tensor, deterministic=self.deterministic
+                    )
+                    if self.deterministic and "mean" in agent_info:
+                        action = agent_info["mean"]
+                else:
+                    raise NotImplementedError("res_agent=False only")
+                action = action.cpu().numpy()
+                obs, reward, done, info = self.eval_env.step(action)
+                ep_actions.append(action)
+                ep_states.append(obs)
+                ep_reward += reward
+            rewards[n] = ep_reward
+        ep_reward = self.eval_env.get_normalized_score(np.mean(rewards)) * 100
+        std = self.eval_env.get_normalized_score(np.std(rewards)) * 100
+        if wandb.run is not None:
+            metrics = {
+                "AdaptiveMDP/AverageReturn": ep_reward,
+                "AdaptiveMDP/StdReturn": std,
+                "AdaptiveMDP/NumEpisodes": n + 1,
+                "AdaptiveMDP/LastEpisodeLength": len(ep_actions),
+            }
+            wandb.log(metrics)
+
+        logger.log("Finished adaptive MDP evaluator.")
+        return ep_reward, std

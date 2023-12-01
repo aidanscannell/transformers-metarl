@@ -170,7 +170,7 @@ def main(
 
     from garage.envs import GymEnv
     from garage.envs.mujoco.half_cheetah_vel_env import HalfCheetahVelEnv
-    from garage.experiment import OnlineMetaEvaluator  # MetaEvaluator,
+    from garage.experiment import OnlineMetaEvaluator, AdaptiveMDPEvaluator
     from garage.experiment import Snapshotter, task_sampler
     from garage.experiment.deterministic import set_seed
     from garage.sampler import LocalSampler
@@ -389,13 +389,16 @@ def main(
 
     # count_parameters(value_function)
 
-    meta_evaluator = OnlineMetaEvaluator(
-        test_task_sampler=tasks,
-        n_test_tasks=1,
-        n_test_episodes=1,
-        prefix="MetaTestAdapt",
-        worker_class=RL2Worker,
-        worker_args=dict(n_episodes_per_trial=20),
+    # meta_evaluator = OnlineMetaEvaluator(
+    #     test_task_sampler=tasks,
+    #     n_test_tasks=1,
+    #     n_test_episodes=1,
+    #     prefix="MetaTestAdapt",
+    #     worker_class=RL2Worker,
+    #     worker_args=dict(n_episodes_per_trial=20),
+    # )
+    meta_evaluator = AdaptiveMDPEvaluator(
+        eval_env=env_class(), n_eval_episodes=20, device="cuda"
     )
     # meta_evaluator = None
 

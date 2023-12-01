@@ -651,7 +651,7 @@ class LogEncoder(json.JSONEncoder):
                         del self._markers[markerid]
         except:
             print("My hack to make this not fail")
-            pass
+            return ""
 
     def _default_inner(self, o):
         """Perform JSON encoding.

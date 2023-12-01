@@ -6,8 +6,28 @@ This is the source code for the paper "Transformers are Meta-Reinforcement Learn
 ## Setup
 To setup the conda environment, execute the following command on the root directory:
 
+```
+ml miniconda
+module load gcc/8.4.0
+```
+
+``` sh
+python transformer_ppo_ours.py --wm_embedding_hidden_size=32 --n_heads=16 --d_model=128 --layers=4 --wm_size=5 --em_size=5 --dim_ff=512 --meta_batch_size=20 --episode_per_task=2 --discount=0.9 --gae_lambda=0.8 --lr_clip_range=0.1 --policy_lr=3e-05 --vf_lr=0.00025 --minibatch_size=256 --max_opt_epochs=10 --policy_ent_coeff=0.0 --entropy_method=regularized --architecture=Encoder  --policy_head_input=latest_memory --attn_type=1 --pre_lnorm --init_params --use_softplus_entropy --gating=residual --learn_std  --init_std=0.2  --tfixup --remove_ln --n_epochs=2500 --policy_lr_schedule=decay --decay_epoch_init=100 --decay_epoch_end=750 --min_lr_factor=0.1 --env_name=HalfCheetahV2 --seed=1
+```
+
+`
+
 ```sh
 conda env create -f environment.yml
+```
+
+```sh
+METARL_CONTAINER_DIR=/scratch/project_462000217/aidan/transformers-metarl/container
+mkdir  $METARL_CONTAINER_DIR
+module load LUMI/22.08
+module load lumi-container-wrapper
+conda-containerize new --mamba --prefix $METARL_CONTAINER_DIR env-amd.yaml
+conda-containerize update $METARL_CONTAINER_DIR --post-install post-install.txt
 ```
 
 ## Reproducibility

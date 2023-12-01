@@ -391,17 +391,19 @@ def main(
 
     # count_parameters(value_function)
 
-    # meta_evaluator = OnlineMetaEvaluator(
-    #     test_task_sampler=tasks,
-    #     n_test_tasks=1,
-    #     n_test_episodes=1,
-    #     prefix="MetaTestAdapt",
-    #     worker_class=RL2Worker,
-    #     worker_args=dict(n_episodes_per_trial=20),
-    # )
-    meta_evaluator = AdaptiveMDPEvaluator(
-        eval_env=env_class(), n_eval_episodes=20, device="cuda"
+    meta_evaluator = OnlineMetaEvaluator(
+        test_task_sampler=tasks,
+        n_test_tasks=20,
+        # n_test_tasks=1,
+        n_test_episodes=1,
+        prefix="MetaTestAdapt",
+        worker_class=RL2Worker,
+        worker_args=dict(n_episodes_per_trial=1),
+        # worker_args=dict(n_episodes_per_trial=20),
     )
+    # meta_evaluator = AdaptiveMDPEvaluator(
+    #     eval_env=env_class(), n_eval_episodes=20, device="cuda"
+    # )
     # meta_evaluator = None
 
     steps_per_epoch = (

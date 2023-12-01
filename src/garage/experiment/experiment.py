@@ -21,7 +21,7 @@ import __main__ as main
 
 exp_count = 0
 now = datetime.datetime.now(dateutil.tz.tzlocal())
-timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
+timestamp = now.strftime("%Y_%m_%d_%H_%M_%S")
 EIGHT_MEBIBYTES = 8 * 2**20
 
 
@@ -44,7 +44,7 @@ def _make_sequential_log_dir(log_dir):
             if i == 0:
                 os.makedirs(log_dir)
             else:
-                possible_log_dir = '{}_{}'.format(log_dir, i)
+                possible_log_dir = "{}_{}".format(log_dir, i)
                 os.makedirs(possible_log_dir)
                 log_dir = possible_log_dir
             return log_dir
@@ -75,24 +75,27 @@ def _make_experiment_signature(function):
         if not saw_first_param:
             # Don't output it to the experiment params, since it will contain
             # the context.
-            if param.name != 'ctxt':
+            if param.name != "ctxt":
                 raise ValueError(
-                    'Experiment functions should have a first '
-                    "parameter named 'ctxt' instead of {!r}".format(
-                        param.name))
+                    "Experiment functions should have a first "
+                    "parameter named 'ctxt' instead of {!r}".format(param.name)
+                )
             saw_first_param = True
         else:
             new_params.append(
-                inspect.Parameter(name=param.name,
-                                  kind=inspect.Parameter.KEYWORD_ONLY,
-                                  default=param.default,
-                                  annotation=param.annotation))
+                inspect.Parameter(
+                    name=param.name,
+                    kind=inspect.Parameter.KEYWORD_ONLY,
+                    default=param.default,
+                    annotation=param.annotation,
+                )
+            )
     if not saw_first_param:
         raise ValueError(
-            'Experiment functions should have a first parameter '
-            "named 'ctxt', but {!r} has no parameters".format(function))
-    return inspect.Signature(new_params,
-                             return_annotation=func_sig.return_annotation)
+            "Experiment functions should have a first parameter "
+            "named 'ctxt', but {!r} has no parameters".format(function)
+        )
+    return inspect.Signature(new_params, return_annotation=func_sig.return_annotation)
 
 
 class ExperimentContext:
@@ -171,9 +174,20 @@ class ExperimentTemplate:
 
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, *, function, log_dir, name, prefix, snapshot_mode,
-                 snapshot_gap, archive_launch_repo, name_parameters,
-                 use_existing_dir, x_axis):
+    def __init__(
+        self,
+        *,
+        function,
+        log_dir,
+        name,
+        prefix,
+        snapshot_mode,
+        snapshot_gap,
+        archive_launch_repo,
+        name_parameters,
+        use_existing_dir,
+        x_axis
+    ):
         self.function = function
         self.log_dir = log_dir
         self.name = name
@@ -219,23 +233,23 @@ class ExperimentTemplate:
         """
         name_parameters = collections.OrderedDict()
 
-        if options['name_parameters'] == 'passed':
-            for param in options['signature'].parameters.values():
+        if options["name_parameters"] == "passed":
+            for param in options["signature"].parameters.values():
                 try:
                     name_parameters[param.name] = params[param.name]
                 except KeyError:
                     pass
-        elif options['name_parameters'] == 'all':
-            for param in options['signature'].parameters.values():
-                name_parameters[param.name] = params.get(
-                    param.name, param.default)
-        elif options['name_parameters'] is not None:
-            raise ValueError('wrap_experiment.name_parameters should be set '
-                             'to one of None, "passed", or "all"')
-        param_str = '_'.join('{}={}'.format(k, v)
-                             for (k, v) in name_parameters.items())
+        elif options["name_parameters"] == "all":
+            for param in options["signature"].parameters.values():
+                name_parameters[param.name] = params.get(param.name, param.default)
+        elif options["name_parameters"] is not None:
+            raise ValueError(
+                "wrap_experiment.name_parameters should be set "
+                'to one of None, "passed", or "all"'
+            )
+        param_str = "_".join("{}={}".format(k, v) for (k, v) in name_parameters.items())
         if param_str:
-            return '{}_{}'.format(name, param_str)
+            return "{}_{}".format(name, param_str)
         else:
             return name
 
@@ -258,27 +272,31 @@ class ExperimentTemplate:
             dict: The final options.
 
         """
-        options = dict(name=self.name,
-                       function=self.function,
-                       prefix=self.prefix,
-                       name_parameters=self.name_parameters,
-                       log_dir=self.log_dir,
-                       archive_launch_repo=self.archive_launch_repo,
-                       snapshot_gap=self.snapshot_gap,
-                       snapshot_mode=self.snapshot_mode,
-                       use_existing_dir=self.use_existing_dir,
-                       x_axis=self.x_axis,
-                       signature=self.__signature__)
+        options = dict(
+            name=self.name,
+            function=self.function,
+            prefix=self.prefix,
+            name_parameters=self.name_parameters,
+            log_dir=self.log_dir,
+            archive_launch_repo=self.archive_launch_repo,
+            snapshot_gap=self.snapshot_gap,
+            snapshot_mode=self.snapshot_mode,
+            use_existing_dir=self.use_existing_dir,
+            x_axis=self.x_axis,
+            signature=self.__signature__,
+        )
         if args:
             if len(args) == 1 and isinstance(args[0], dict):
                 for k in args[0]:
                     if k not in options:
-                        raise ValueError('Unknown key {} in wrap_experiment '
-                                         'options'.format(k))
+                        raise ValueError(
+                            "Unknown key {} in wrap_experiment " "options".format(k)
+                        )
                 options.update(args[0])
             else:
-                raise ValueError('garage.experiment currently only supports '
-                                 'keyword arguments')
+                raise ValueError(
+                    "garage.experiment currently only supports " "keyword arguments"
+                )
         return options
 
     @classmethod
@@ -297,44 +315,46 @@ class ExperimentTemplate:
             ExperimentContext: The created experiment context.
 
         """
-        name = options['name']
+        name = options["name"]
         if name is None:
-            name = options['function'].__name__
+            name = options["function"].__name__
         name = cls._augment_name(options, name, kwargs)
-        log_dir = options['log_dir']
+        log_dir = options["log_dir"]
         if log_dir is None:
-            log_dir = ('{data}/local/{prefix}/{name}'.format(
-                data=os.path.join(os.getcwd(), 'data'),
-                prefix=options['prefix'],
-                name=name))
-        if options['use_existing_dir']:
+            log_dir = "{data}/local/{prefix}/{name}".format(
+                data=os.path.join(os.getcwd(), "data"),
+                prefix=options["prefix"],
+                name=name,
+            )
+        if options["use_existing_dir"]:
             os.makedirs(log_dir, exist_ok=True)
         else:
             log_dir = _make_sequential_log_dir(log_dir)
 
-        tabular_log_file = os.path.join(log_dir, 'progress.csv')
-        text_log_file = os.path.join(log_dir, 'debug.log')
-        variant_log_file = os.path.join(log_dir, 'variant.json')
-        metadata_log_file = os.path.join(log_dir, 'metadata.json')
+        tabular_log_file = os.path.join(log_dir, "progress.csv")
+        text_log_file = os.path.join(log_dir, "debug.log")
+        variant_log_file = os.path.join(log_dir, "variant.json")
+        metadata_log_file = os.path.join(log_dir, "metadata.json")
 
         dump_json(variant_log_file, kwargs)
         git_root_path, metadata = get_metadata()
         dump_json(metadata_log_file, metadata)
-        if git_root_path and options['archive_launch_repo']:
+        if git_root_path and options["archive_launch_repo"]:
             make_launcher_archive(git_root_path=git_root_path, log_dir=log_dir)
 
         logger.add_output(dowel.TextOutput(text_log_file))
         logger.add_output(dowel.CsvOutput(tabular_log_file))
-        logger.add_output(
-            dowel.TensorBoardOutput(log_dir, x_axis=options['x_axis']))
+        logger.add_output(dowel.TensorBoardOutput(log_dir, x_axis=options["x_axis"]))
         logger.add_output(dowel.StdOutput())
 
-        logger.push_prefix('[{}] '.format(name))
-        logger.log('Logging to {}'.format(log_dir))
+        logger.push_prefix("[{}] ".format(name))
+        logger.log("Logging to {}".format(log_dir))
 
-        return ExperimentContext(snapshot_dir=log_dir,
-                                 snapshot_mode=options['snapshot_mode'],
-                                 snapshot_gap=options['snapshot_gap'])
+        return ExperimentContext(
+            snapshot_dir=log_dir,
+            snapshot_mode=options["snapshot_mode"],
+            snapshot_gap=options["snapshot_gap"],
+        )
 
     def __call__(self, *args, **kwargs):
         """Wrap a function to turn it into an ExperimentTemplate.
@@ -358,8 +378,10 @@ class ExperimentTemplate:
         """
         if self.function is None:
             if len(args) != 1 or len(kwargs) != 0 or not callable(args[0]):
-                raise ValueError('Please apply the result of '
-                                 'wrap_experiment() to a single function')
+                raise ValueError(
+                    "Please apply the result of "
+                    "wrap_experiment() to a single function"
+                )
             # Apply ourselves as a decorator
             self.function = args[0]
             self._update_wrap_params()
@@ -373,17 +395,19 @@ class ExperimentTemplate:
             return result
 
 
-def wrap_experiment(function=None,
-                    *,
-                    log_dir=None,
-                    prefix='experiment',
-                    name=None,
-                    snapshot_mode='last',
-                    snapshot_gap=1,
-                    archive_launch_repo=True,
-                    name_parameters=None,
-                    use_existing_dir=False,
-                    x_axis='TotalEnvSteps'):
+def wrap_experiment(
+    function=None,
+    *,
+    log_dir=None,
+    prefix="experiment",
+    name=None,
+    snapshot_mode="last",
+    snapshot_gap=1,
+    archive_launch_repo=True,
+    name_parameters=None,
+    use_existing_dir=False,
+    x_axis="TotalEnvSteps"
+):
     """Decorate a function to turn it into an ExperimentTemplate.
 
     When invoked, the wrapped function will receive an ExperimentContext, which
@@ -436,16 +460,18 @@ def wrap_experiment(function=None,
         callable: The wrapped function.
 
     """
-    return ExperimentTemplate(function=function,
-                              log_dir=log_dir,
-                              prefix=prefix,
-                              name=name,
-                              snapshot_mode=snapshot_mode,
-                              snapshot_gap=snapshot_gap,
-                              archive_launch_repo=archive_launch_repo,
-                              name_parameters=name_parameters,
-                              use_existing_dir=use_existing_dir,
-                              x_axis=x_axis)
+    return ExperimentTemplate(
+        function=function,
+        log_dir=log_dir,
+        prefix=prefix,
+        name=name,
+        snapshot_mode=snapshot_mode,
+        snapshot_gap=snapshot_gap,
+        archive_launch_repo=archive_launch_repo,
+        name_parameters=name_parameters,
+        use_existing_dir=use_existing_dir,
+        x_axis=x_axis,
+    )
 
 
 def dump_json(filename, data):
@@ -457,16 +483,13 @@ def dump_json(filename, data):
 
     """
     pathlib.Path(os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         # We do our own circular reference handling.
         # Sometimes sort_keys fails because the keys don't get made into
         # strings early enough.
-        json.dump(data,
-                  f,
-                  indent=2,
-                  sort_keys=False,
-                  cls=LogEncoder,
-                  check_circular=False)
+        json.dump(
+            data, f, indent=2, sort_keys=False, cls=LogEncoder, check_circular=False
+        )
 
 
 def get_metadata():
@@ -490,38 +513,40 @@ def get_metadata():
                 absolute path to the main script.
 
     """
-    main_file = getattr(main, '__file__', None)
+    main_file = getattr(main, "__file__", None)
     if not main_file:
         return None, {}
     main_file_path = os.path.abspath(main_file)
     try:
         git_root_path = subprocess.check_output(
-            ('git', 'rev-parse', '--show-toplevel'),
+            ("git", "rev-parse", "--show-toplevel"),
             cwd=os.path.dirname(main_file_path),
-            stderr=subprocess.DEVNULL)
+            stderr=subprocess.DEVNULL,
+        )
         git_root_path = git_root_path.strip()
     except subprocess.CalledProcessError:
         # This file is always considered not to exist.
-        git_root_path = ''
+        git_root_path = ""
     # We check that the path exists since in old versions of git the above
     # rev-parse command silently exits with 0 when run outside of a git repo.
     if not os.path.exists(git_root_path):
         return None, {
-            'launcher': main_file_path,
+            "launcher": main_file_path,
         }
-    launcher_path = os.path.relpath(bytes(main_file_path, encoding='utf8'),
-                                    git_root_path)
-    git_hash = subprocess.check_output(('git', 'rev-parse', 'HEAD'),
-                                       cwd=git_root_path)
-    git_hash = git_hash.decode('utf-8').strip()
-    git_status = subprocess.check_output(('git', 'status', '--short'),
-                                         cwd=git_root_path)
-    git_status = git_status.decode('utf-8').strip()
-    if git_status != '':
-        git_hash = git_hash + '-dirty'
+    launcher_path = os.path.relpath(
+        bytes(main_file_path, encoding="utf8"), git_root_path
+    )
+    git_hash = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=git_root_path)
+    git_hash = git_hash.decode("utf-8").strip()
+    git_status = subprocess.check_output(
+        ("git", "status", "--short"), cwd=git_root_path
+    )
+    git_status = git_status.decode("utf-8").strip()
+    if git_status != "":
+        git_hash = git_hash + "-dirty"
     return git_root_path, {
-        'githash': git_hash,
-        'launcher': launcher_path.decode('utf-8'),
+        "githash": git_hash,
+        "launcher": launcher_path.decode("utf-8"),
     }
 
 
@@ -534,12 +559,12 @@ def make_launcher_archive(*, git_root_path, log_dir):
 
     """
     git_files = subprocess.check_output(
-        ('git', 'ls-files', '--others', '--exclude-standard', '--cached',
-         '-z'),
-        cwd=git_root_path).strip()
+        ("git", "ls-files", "--others", "--exclude-standard", "--cached", "-z"),
+        cwd=git_root_path,
+    ).strip()
     repo_size = 0
     files_to_archive = []
-    for f in git_files.split(b'\0'):
+    for f in git_files.split(b"\0"):
         try:
             file_size = os.stat(os.path.join(git_root_path, f)).st_size
             repo_size += file_size
@@ -548,15 +573,27 @@ def make_launcher_archive(*, git_root_path, log_dir):
         except FileNotFoundError:
             pass
     if repo_size >= EIGHT_MEBIBYTES:
-        warnings.warn('Archiving a launch repo larger than 8MiB. This may be '
-                      'slow. Set archive_launch_repo=False in wrap_experiment '
-                      'to disable this behavior.')
-    archive_path = os.path.join(log_dir, 'launch_archive.tar.xz')
-    subprocess.run(('tar', '--null', '--files-from', '-', '--xz', '--create',
-                    '--file', archive_path),
-                   input=b'\0'.join(files_to_archive),
-                   cwd=git_root_path,
-                   check=True)
+        warnings.warn(
+            "Archiving a launch repo larger than 8MiB. This may be "
+            "slow. Set archive_launch_repo=False in wrap_experiment "
+            "to disable this behavior."
+        )
+    archive_path = os.path.join(log_dir, "launch_archive.tar.xz")
+    subprocess.run(
+        (
+            "tar",
+            "--null",
+            "--files-from",
+            "-",
+            "--xz",
+            "--create",
+            "--file",
+            archive_path,
+        ),
+        input=b"\0".join(files_to_archive),
+        cwd=git_root_path,
+        check=True,
+    )
 
 
 class LogEncoder(json.JSONEncoder):
@@ -574,9 +611,9 @@ class LogEncoder(json.JSONEncoder):
 
     # Modules whose contents cannot be meaningfully or safelly jsonified.
     BLOCKED_MODULES = {
-        'tensorflow',
-        'ray',
-        'itertools',
+        "tensorflow",
+        "ray",
+        "itertools",
     }
 
     def default(self, o):
@@ -599,18 +636,22 @@ class LogEncoder(json.JSONEncoder):
         # This circular reference checking code was copied from the standard
         # library json implementation, but it outputs a repr'd string instead
         # of ValueError on a circular reference.
-        if isinstance(o, (int, bool, float, str)):
-            return o
-        else:
-            markerid = id(o)
-            if markerid in self._markers:
-                return 'circular ' + repr(o)
+        try:
+            if isinstance(o, (int, bool, float, str)):
+                return o
             else:
-                self._markers[markerid] = o
-                try:
-                    return self._default_inner(o)
-                finally:
-                    del self._markers[markerid]
+                markerid = id(o)
+                if markerid in self._markers:
+                    return "circular " + repr(o)
+                else:
+                    self._markers[markerid] = o
+                    try:
+                        return self._default_inner(o)
+                    finally:
+                        del self._markers[markerid]
+        except:
+            print("My hack to make this not fail")
+            pass
 
     def _default_inner(self, o):
         """Perform JSON encoding.
@@ -638,7 +679,7 @@ class LogEncoder(json.JSONEncoder):
         except TypeError as err:
             if isinstance(o, dict):
                 data = {}
-                for (k, v) in o.items():
+                for k, v in o.items():
                     if isinstance(k, str):
                         data[k] = self.default(v)
                     else:
@@ -646,10 +687,10 @@ class LogEncoder(json.JSONEncoder):
                 return data
             elif isinstance(o, weakref.ref):
                 return repr(o)
-            elif type(o).__module__.split('.')[0] in self.BLOCKED_MODULES:
+            elif type(o).__module__.split(".")[0] in self.BLOCKED_MODULES:
                 return repr(o)
             elif isinstance(o, type):
-                return {'$typename': o.__module__ + '.' + o.__name__}
+                return {"$typename": o.__module__ + "." + o.__name__}
             elif isinstance(o, np.number):
                 # For some reason these aren't natively considered
                 # serializable.
@@ -659,26 +700,22 @@ class LogEncoder(json.JSONEncoder):
                 return bool(o)
             elif isinstance(o, enum.Enum):
                 return {
-                    '$enum':
-                    o.__module__ + '.' + o.__class__.__name__ + '.' + o.name
+                    "$enum": o.__module__ + "." + o.__class__.__name__ + "." + o.name
                 }
             elif isinstance(o, np.ndarray):
                 return repr(o)
-            elif hasattr(o, '__dict__') or hasattr(o, '__slots__'):
-                obj_dict = getattr(o, '__dict__', None)
+            elif hasattr(o, "__dict__") or hasattr(o, "__slots__"):
+                obj_dict = getattr(o, "__dict__", None)
                 if obj_dict is not None:
                     data = {k: self.default(v) for (k, v) in obj_dict.items()}
                 else:
-                    data = {
-                        s: self.default(getattr(o, s))
-                        for s in o.__slots__
-                    }
+                    data = {s: self.default(getattr(o, s)) for s in o.__slots__}
                 t = type(o)
-                data['$type'] = t.__module__ + '.' + t.__name__
+                data["$type"] = t.__module__ + "." + t.__name__
                 return data
-            elif callable(o) and hasattr(o, '__name__'):
-                if getattr(o, '__module__', None) is not None:
-                    return {'$function': o.__module__ + '.' + o.__name__}
+            elif callable(o) and hasattr(o, "__name__"):
+                if getattr(o, "__module__", None) is not None:
+                    return {"$function": o.__module__ + "." + o.__name__}
                 else:
                     return repr(o)
             else:
